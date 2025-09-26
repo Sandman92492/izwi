@@ -57,11 +57,11 @@
 <div class="flex flex-col h-screen">
 <header class="flex items-center justify-between p-4 bg-background-light dark:bg-background-dark shadow-sm">
 <img alt="iZwi Logo" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_pOQD51q3I4utHDxslkN1ZBiEl-4EUWUU_FQqCvGSavCkVmN-lbf04w7_Qh8qmxlpIxQojb1JpWBbWB1eiNFCNbgo9wGtZYgh8ApxzdC9NzEOlxHQUWlFF8metjKlTZAyDzSD4QMrQxzEdtnsbwKGkDUezK7Ll1FoufX6C2r39f4Mjp59oBfDyVtQB7yHBri-X5_zV2ASI6UP7U117eycls3T2YarZGCWiS_EwxzQMbhIKeFZw-2DLoO3ygX6j-W3d_i-i1TEpoU"/>
-<button class="p-2 rounded-full">
+<a href="{{ url_for('settings') }}" class="p-2 rounded-full">
 <svg class="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <path d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
 </svg>
-</button>
+</a>
 </header>
 <main class="flex-1 flex flex-col overflow-hidden">
 <div class="h-1/2 relative">
@@ -157,8 +157,7 @@ function getCategoryIcon(category) {
 }
 
 function showPostAlert() {
-    // This will be implemented when we add the post alert modal
-    alert('Post Alert functionality - to be implemented');
+    window.location.href = '/post-alert';
 }
 </script>
 

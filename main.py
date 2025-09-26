@@ -172,27 +172,31 @@ def dashboard():
     
     return render_template('dashboard.html', alerts=alerts)
 
-@app.route('/post-alert', methods=['POST'])
+@app.route('/post-alert', methods=['GET', 'POST'])
 @login_required
 def post_alert():
     if not current_user.community_id:
         return redirect(url_for('define_community'))
     
-    category = request.form['category']
-    description = request.form['description']
-    latitude = request.form.get('latitude', 0)
-    longitude = request.form.get('longitude', 0)
+    if request.method == 'POST':
+        category = request.form['category']
+        description = request.form['description']
+        latitude = float(request.form.get('latitude', 0)) if request.form.get('latitude') else 0
+        longitude = float(request.form.get('longitude', 0)) if request.form.get('longitude') else 0
+        
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('''
+            INSERT INTO alerts (community_id, user_id, category, description, latitude, longitude, timestamp, is_resolved)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (current_user.community_id, current_user.id, category, description, latitude, longitude, datetime.now(), 0))
+        
+        db.commit()
+        
+        flash('Alert posted successfully!')
+        return redirect(url_for('dashboard'))
     
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('''
-        INSERT INTO alerts (community_id, user_id, category, description, latitude, longitude, timestamp, is_resolved)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (current_user.community_id, current_user.id, category, description, latitude, longitude, datetime.now(), 0))
-    
-    db.commit()
-    
-    return redirect(url_for('dashboard'))
+    return render_template('post_alert.html')
 
 @app.route('/settings')
 @login_required
