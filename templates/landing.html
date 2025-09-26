@@ -79,7 +79,7 @@
 </div>
 <div class="w-full lg:w-1/2 text-center lg:text-left">
 <h2 class="font-display font-semibold text-3xl md:text-4xl text-primary-text dark:text-white leading-tight">
-                            You're invited to join <span class="text-primary">Willow Creek</span>!
+                            {% if invite %}You're invited to join a community!{% else %}Create Your Community{% endif %}
                         </h2>
 <form method="POST" action="{{ url_for('signup') }}" class="mt-8 space-y-4">
 <div>

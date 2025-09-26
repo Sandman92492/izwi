@@ -1,14 +1,17 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from database import init_db, get_db
+import os
 import sqlite3
 import secrets
 import string
 from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from database import init_db, get_db
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'  # Will be replaced with environment variable
+app.secret_key = os.environ.get('SESSION_SECRET')
+if not app.secret_key:
+    raise ValueError("SESSION_SECRET environment variable is required")
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -241,4 +244,5 @@ def join_community(slug):
 
 if __name__ == '__main__':
     init_db()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1', 'yes')
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)

@@ -59,9 +59,10 @@
 <div class="w-10"></div>
 </header>
 <main class="flex flex-1 flex-col gap-4 p-4">
+<form method="POST" class="flex flex-1 flex-col gap-4">
 <div class="flex flex-col">
 <label class="sr-only" for="community-name">Community Name</label>
-<input class="h-14 w-full rounded-lg border-none bg-subtle-light px-4 text-content-light placeholder-placeholder-light focus:ring-2 focus:ring-primary dark:bg-subtle-dark dark:text-content-dark dark:placeholder-placeholder-dark" id="community-name" placeholder="Community Name" type="text"/>
+<input class="h-14 w-full rounded-lg border-none bg-subtle-light px-4 text-content-light placeholder-placeholder-light focus:ring-2 focus:ring-primary dark:bg-subtle-dark dark:text-content-dark dark:placeholder-placeholder-dark" id="community-name" name="community_name" placeholder="Community Name" type="text" required/>
 </div>
 <div class="relative flex-1 rounded-lg bg-subtle-light dark:bg-subtle-dark">
 <div class="absolute inset-0 z-0 bg-cover bg-center rounded-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB_RlXTgEfNTPHQWNfQnynP81GQKqlQZ5DUV224Ar6RomGgbIniE_Jx8l-ff8fEKrKhiBY77H8FgyyzqH0snVvMQvnF8eRK1fiLdGdjVcN8wU2WwCY0wUX5zcoIHGCu2pOZvvmyaiW8GHSkiZTO-B7kvKG0mrFgn-k5yG1Qm5qaOm4paVmH9tfCLn6lqxrtFAdYuXZFIWV6IBrgJU2FA7fu82ZzhGp3h7hc7knqvcfBpCZGcbVKYEF742EdODN_P-VQKWOjN1R0BU0")'></div>
@@ -96,9 +97,10 @@
 </div>
 </main>
 <footer class="p-4">
-<button class="h-14 w-full rounded-lg bg-primary text-white font-bold disabled:bg-primary/50 disabled:cursor-not-allowed" disabled="">
+<button type="submit" class="h-14 w-full rounded-lg bg-primary text-white font-bold hover:bg-primary/90">
           Create Community
         </button>
+</form>
 </footer>
 </div>
 
