@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>iZwi - Post Alert</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#19b3a1",
+            "background-light": "#f6f8f8",
+            "background-dark": "#11211f",
+          },
+          fontFamily: {
+            "display": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="fixed inset-0 bg-black/30 flex items-end">
+<div class="w-full bg-background-light dark:bg-background-dark rounded-t-xl">
+<div class="flex justify-center py-3">
+<div class="w-10 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+</div>
+<div class="p-4 space-y-6">
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Post a New Alert</h1>
+<div>
+<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Category</h2>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">warning</span>
+<span class="font-semibold text-gray-900 dark:text-white">Emergency</span>
+</button>
+<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">local_fire_department</span>
+<span class="font-semibold text-gray-900 dark:text-white">Fire</span>
+</button>
+<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">directions_car</span>
+<span class="font-semibold text-gray-900 dark:text-white">Traffic</span>
+</button>
+<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">filter_drama</span>
+<span class="font-semibold text-gray-900 dark:text-white">Weather</span>
+</button>
+<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">cottage</span>
+<span class="font-semibold text-gray-900 dark:text-white">Community</span>
+</button>
+<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">help_outline</span>
+<span class="font-semibold text-gray-900 dark:text-white">Other</span>
+</button>
+</div>
+</div>
+<div>
+<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Describe what's happening...</h2>
+<textarea class="w-full h-28 p-3 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none resize-none" placeholder="Add details here..."></textarea>
+</div>
+<div>
+<h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Location</h2>
+<div class="relative aspect-video w-full rounded-xl overflow-hidden group">
+<div class="w-full h-full bg-center bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC3cYRIvbODLbjWCHG0Nk83DYunHZAkmY6087t_H7gQpRS-KeeGuNVkp4Bh7L4FsKDzQypejV8b1066t8DFD-Fzw_6jWMxG3xuTv65u9iZr-9mX91ueuLRHcmzWZX4xj6HkjHL77jNwFGwszsk-b5Qukn1M_qefaG_P8I5_SPNNreEo_5WCr8_pU6xLGQpJZoPcJOXFB8JbzE7lTkP_mCcqzV0pBl7uV4BrR_HGIf8BIRHkBOVApkcPT18aAju-VDB3X6tkqQj9HHg");'></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-5xl text-red-500 drop-shadow-lg">location_on</span>
+</div>
+<div class="absolute bottom-3 right-3 bg-white/80 dark:bg-black/60 p-2 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">drag_indicator</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-opacity-90 transition-colors duration-200">
+          Post Alert
+        </button>
+</div>
+<div class="h-5"></div>
+</div>
+</div>
+
+</body></html>
