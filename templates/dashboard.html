@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Poppins:wght@500;600&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -63,7 +65,7 @@
 </header>
 <main class="flex-1 flex flex-col overflow-hidden">
 <div class="h-1/2 relative">
-<img alt="Map of community with alert icons" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU80H9JDWlBex2T3WeB7nDboFebNqp7D2RrBWJm8QMC4VQyIoEUISP2Wt9KEGH5yQxKeQFRCTS7FzN_o6_VAYbDdB12TRVVCpPyh2hKpfk5x0pncnm5AcyvNcvbyG865HxLUVwCXfdY1dvXZTXllOMV5-6gkSFLbHj93r64dNbs10OQ3Mok3H8e7qM_rAEvnJgVreReWzM9InS9vD6QJq0hBNChJK844bX0o6hwdgCA4Qrvr5cIgCmV88__zhGYw9hKjX1m8hkCOE"/>
+<div id="map" class="w-full h-full"></div>
 </div>
 <div class="h-1/2 flex flex-col bg-white">
 <div class="p-4 border-b border-gray-200">
@@ -104,5 +106,60 @@
 </svg>
 </button>
 </div>
+
+<script>
+// Initialize the map
+var map = L.map('map').setView([-26.2041, 28.0473], 13); // Default to Johannesburg
+
+// Add tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// Alert markers data
+var alerts = [
+    {% for alert in alerts %}
+    {
+        id: {{ alert[0] }},
+        category: "{{ alert[3] }}",
+        description: "{{ alert[4] }}",
+        lat: {{ alert[5] if alert[5] else -26.2041 }},
+        lng: {{ alert[6] if alert[6] else 28.0473 }},
+        timestamp: "{{ alert[7] }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+
+// Add markers for each alert
+alerts.forEach(function(alert) {
+    var icon = L.divIcon({
+        className: 'custom-alert-marker',
+        html: '<div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold bg-alert-' + alert.category.toLowerCase() + '">' + 
+              getCategoryIcon(alert.category) + '</div>',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+    });
+    
+    var marker = L.marker([alert.lat, alert.lng], {icon: icon}).addTo(map);
+    marker.bindPopup('<div class="p-2"><strong>' + alert.category + '</strong><br>' + 
+                     alert.description + '<br><small>' + alert.timestamp + '</small></div>');
+});
+
+function getCategoryIcon(category) {
+    switch(category.toLowerCase()) {
+        case 'emergency': return '🚨';
+        case 'fire': return '🔥';
+        case 'traffic': return '🚗';
+        case 'weather': return '⛈️';
+        case 'community': return '🏘️';
+        default: return '❗';
+    }
+}
+
+function showPostAlert() {
+    // This will be implemented when we add the post alert modal
+    alert('Post Alert functionality - to be implemented');
+}
+</script>
 
 </body></html>
