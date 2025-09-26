@@ -52,21 +52,21 @@
 <div class="text-center mb-8">
 <h1 class="text-4xl font-bold text-text-primary dark:text-background-light">iZwi</h1>
 </div>
-<div class="space-y-6">
+<form method="POST" class="space-y-6">
 <div>
 <label class="sr-only" for="email">Email</label>
-<input class="w-full h-14 px-4 bg-input-light dark:bg-input-dark text-text-primary dark:text-background-light placeholder-placeholder-light dark:placeholder-placeholder-dark border-0 rounded-lg focus:ring-2 focus:ring-primary focus:ring-opacity-50" id="email" placeholder="Email" type="email"/>
+<input class="w-full h-14 px-4 bg-input-light dark:bg-input-dark text-text-primary dark:text-background-light placeholder-placeholder-light dark:placeholder-placeholder-dark border-0 rounded-lg focus:ring-2 focus:ring-primary focus:ring-opacity-50" id="email" name="email" placeholder="Email" type="email" required/>
 </div>
 <div>
 <label class="sr-only" for="password">Password</label>
-<input class="w-full h-14 px-4 bg-input-light dark:bg-input-dark text-text-primary dark:text-background-light placeholder-placeholder-light dark:placeholder-placeholder-dark border-0 rounded-lg focus:ring-2 focus:ring-primary focus:ring-opacity-50" id="password" placeholder="Password" type="password"/>
-</div>
+<input class="w-full h-14 px-4 bg-input-light dark:bg-input-dark text-text-primary dark:text-background-light placeholder-placeholder-light dark:placeholder-placeholder-dark border-0 rounded-lg focus:ring-2 focus:ring-primary focus:ring-opacity-50" id="password" name="password" placeholder="Password" type="password" required/>
 </div>
 <div class="mt-8">
-<button class="w-full h-14 bg-primary text-white font-bold rounded-lg hover:bg-opacity-90 transition-colors duration-300">
+<button type="submit" class="w-full h-14 bg-primary text-white font-bold rounded-lg hover:bg-opacity-90 transition-colors duration-300">
                     Login
                 </button>
 </div>
+</form>
 <div class="text-center mt-6">
 <a class="text-sm text-placeholder-light dark:text-placeholder-dark hover:text-primary dark:hover:text-primary underline" href="#">
                     Don't have an account? Sign Up

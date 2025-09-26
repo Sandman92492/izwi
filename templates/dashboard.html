@@ -70,60 +70,31 @@
 <h2 class="font-display font-bold text-xl text-primary">Recent Alerts</h2>
 </div>
 <div class="flex-1 overflow-y-auto px-4 space-y-4 pt-4 pb-20">
+{% for alert in alerts %}
 <div class="bg-white rounded-lg shadow-md flex flex-col border border-gray-200">
 <div class="p-4 flex-1">
 <div class="flex items-start justify-between mb-2">
 <div>
-<span class="inline-block bg-alert-crime/10 text-alert-crime text-xs font-semibold px-2.5 py-1 rounded-full font-body uppercase tracking-wider">Crime</span>
-<h3 class="font-display font-bold text-lg text-primary mt-1">Armed Robbery</h3>
+<span class="inline-block bg-alert-{{alert[3].lower()}}/10 text-alert-{{alert[3].lower()}} text-xs font-semibold px-2.5 py-1 rounded-full font-body uppercase tracking-wider">{{alert[3]}}</span>
+<h3 class="font-display font-bold text-lg text-primary mt-1">{{alert[4]}}</h3>
 </div>
 <div class="text-right">
-<span class="text-sm text-text-secondary font-medium font-body">5 min ago</span>
+<span class="text-sm text-text-secondary font-medium font-body">{{alert[7]}}</span>
 </div>
 </div>
-<p class="font-body text-text-primary dark:text-gray-300 text-sm mb-3">Suspects fled in a blue sedan.</p>
+<p class="font-body text-text-primary dark:text-gray-300 text-sm mb-3">{{alert[4]}}</p>
 <div class="flex items-center text-text-secondary text-sm">
 <span class="material-symbols-outlined text-base mr-1.5">location_on</span>
-<p class="font-body">Near Oak Street</p>
+<p class="font-body">Lat: {{alert[5]}}, Lng: {{alert[6]}}</p>
 </div>
 </div>
 </div>
-<div class="bg-white rounded-lg shadow-md flex flex-col border border-gray-200">
-<div class="p-4 flex-1">
-<div class="flex items-start justify-between mb-2">
-<div>
-<span class="inline-block bg-alert-utility/10 text-alert-utility text-xs font-semibold px-2.5 py-1 rounded-full font-body uppercase tracking-wider">Utility</span>
-<h3 class="font-display font-bold text-lg text-primary mt-1">Power Outage</h3>
+{% endfor %}
+{% if not alerts %}
+<div class="text-center py-8">
+<p class="text-text-secondary">No alerts in your community yet.</p>
 </div>
-<div class="text-right">
-<span class="text-sm text-text-secondary font-medium font-body">30 min ago</span>
-</div>
-</div>
-<p class="font-body text-text-primary dark:text-gray-300 text-sm mb-3">Unplanned power outage. Eskom has been notified.</p>
-<div class="flex items-center text-text-secondary text-sm">
-<span class="material-symbols-outlined text-base mr-1.5">location_on</span>
-<p class="font-body">North-West Quadrant</p>
-</div>
-</div>
-</div>
-<div class="bg-white rounded-lg shadow-md flex flex-col border border-gray-200">
-<div class="p-4 flex-1">
-<div class="flex items-start justify-between mb-2">
-<div>
-<span class="inline-block bg-alert-event/10 text-alert-event text-xs font-semibold px-2.5 py-1 rounded-full font-body uppercase tracking-wider">Event</span>
-<h3 class="font-display font-bold text-lg text-primary mt-1">Community Market</h3>
-</div>
-<div class="text-right">
-<span class="text-sm text-text-secondary font-medium font-body">2 hours ago</span>
-</div>
-</div>
-<p class="font-body text-text-primary dark:text-gray-300 text-sm mb-3">Join us for the weekly community market! From 9am to 2pm.</p>
-<div class="flex items-center text-text-secondary text-sm">
-<span class="material-symbols-outlined text-base mr-1.5">location_on</span>
-<p class="font-body">Community Park</p>
-</div>
-</div>
-</div>
+{% endif %}
 </div>
 </div>
 </main>
