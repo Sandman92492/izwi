@@ -62,27 +62,27 @@
 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Category</h2>
 <input type="hidden" name="category" id="selected_category" required>
 <div class="grid grid-cols-2 gap-3">
-<button type="button" onclick="selectCategory('Emergency')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory(event, 'Emergency')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">warning</span>
 <span class="font-semibold text-gray-900 dark:text-white">Emergency</span>
 </button>
-<button type="button" onclick="selectCategory('Fire')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory(event, 'Fire')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">local_fire_department</span>
 <span class="font-semibold text-gray-900 dark:text-white">Fire</span>
 </button>
-<button type="button" onclick="selectCategory('Traffic')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory(event, 'Traffic')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">directions_car</span>
 <span class="font-semibold text-gray-900 dark:text-white">Traffic</span>
 </button>
-<button type="button" onclick="selectCategory('Weather')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory(event, 'Weather')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">filter_drama</span>
 <span class="font-semibold text-gray-900 dark:text-white">Weather</span>
 </button>
-<button type="button" onclick="selectCategory('Community')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory(event, 'Community')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">cottage</span>
 <span class="font-semibold text-gray-900 dark:text-white">Community</span>
 </button>
-<button type="button" onclick="selectCategory('Other')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory(event, 'Other')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">help_outline</span>
 <span class="font-semibold text-gray-900 dark:text-white">Other</span>
 </button>
@@ -155,7 +155,7 @@ if (navigator.geolocation) {
 }
 
 // Category selection
-function selectCategory(category) {
+function selectCategory(event, category) {
     // Remove previous selection
     document.querySelectorAll('.category-btn').forEach(btn => {
         btn.classList.remove('bg-primary', 'text-white');

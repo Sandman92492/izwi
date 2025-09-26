@@ -67,6 +67,7 @@
 <div class="flex flex-col">
 <label class="sr-only" for="community-name">Community Name</label>
 <input class="h-14 w-full rounded-lg border-none bg-subtle-light px-4 text-content-light placeholder-placeholder-light focus:ring-2 focus:ring-primary dark:bg-subtle-dark dark:text-content-dark dark:placeholder-placeholder-dark" id="community-name" name="community_name" placeholder="Community Name" type="text" required/>
+<input type="hidden" name="boundary_data" id="boundary_data">
 </div>
 <div class="relative flex-1 rounded-lg bg-subtle-light dark:bg-subtle-dark">
 <div id="community-map" class="w-full h-full rounded-lg"></div>
@@ -154,8 +155,9 @@ communityMap.on(L.Draw.Event.CREATED, function (e) {
     // Add the new boundary
     drawnItems.addLayer(layer);
     
-    // Store boundary data (you can extend this to save to backend)
+    // Store boundary data
     var boundaryData = layer.toGeoJSON();
+    document.getElementById('boundary_data').value = JSON.stringify(boundaryData);
     console.log('Community boundary defined:', boundaryData);
 });
 
@@ -163,11 +165,13 @@ communityMap.on(L.Draw.Event.EDITED, function (e) {
     var layers = e.layers;
     layers.eachLayer(function (layer) {
         var boundaryData = layer.toGeoJSON();
+        document.getElementById('boundary_data').value = JSON.stringify(boundaryData);
         console.log('Community boundary updated:', boundaryData);
     });
 });
 
 communityMap.on(L.Draw.Event.DELETED, function (e) {
+    document.getElementById('boundary_data').value = '';
     console.log('Community boundary deleted');
 });
 </script>

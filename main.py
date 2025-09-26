@@ -122,6 +122,7 @@ def logout():
 def define_community():
     if request.method == 'POST':
         community_name = request.form['community_name']
+        boundary_data = request.form.get('boundary_data', '')
         
         # Create new community
         db = get_db()
@@ -146,6 +147,10 @@ def define_community():
         # Update current user object
         current_user.community_id = community_id
         current_user.role = 'Admin'
+        
+        # Log boundary data for future use (could be stored in database)
+        if boundary_data:
+            print(f"Community boundary data for {community_name}: {boundary_data}")
         
         return redirect(url_for('dashboard'))
     
