@@ -9,6 +9,10 @@ A Flask-based community alert system that allows users to create and join commun
 - **2025-09-26**: Dynamic Jinja2 template integration
 - **2025-09-26**: All core routes implemented (login, signup, dashboard, settings, community creation)
 - **2025-09-26**: Security improvements (environment-based secret key)
+- **2025-09-26**: Interactive maps functionality using Leaflet.js
+- **2025-09-26**: Dashboard map with real-time alert markers and category icons
+- **2025-09-26**: Post alert location selection with click-to-set and geolocation
+- **2025-09-26**: Community boundary drawing with Leaflet Draw tools
 
 ## Project Architecture
 ### Backend Structure
@@ -32,6 +36,12 @@ A Flask-based community alert system that allows users to create and join commun
 - Community creation with unique invite link generation
 - Role-based access control (Admin/Member)
 - Alert posting with categories: Emergency, Fire, Traffic, Weather, Community, Other
+- **Interactive Maps with Leaflet.js**:
+  - Dashboard map displaying community alerts as markers with category icons
+  - Click-to-set location selection for posting alerts
+  - Automatic geolocation support for user's current position
+  - Community boundary drawing tools with polygon/circle/rectangle options
+  - Real-time map interactions with popups showing alert details
 - Member management with admin controls
 - Community invitation system via unique URL slugs
 - Responsive design with Tailwind CSS
