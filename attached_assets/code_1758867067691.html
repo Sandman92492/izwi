@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>iZwi - Community Alerts</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Poppins:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#264653",
+                        "secondary": "#E9C46A",
+                        "background": "#F8F9FA",
+                        "text-primary": "#264653",
+                        "alert-crime": "#E76F51",
+                        "alert-utility": "#F4A261",
+                        "alert-event": "#2A9D8F",
+                        "text-secondary": "#6C757D"
+                    },
+                    fontFamily: {
+                        "display": ["Poppins", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.75rem",
+                        "lg": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .font-display { font-family: 'Poppins', sans-serif; }
+        .font-body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body text-text-primary">
+<div class="flex flex-col h-screen">
+<header class="flex items-center justify-between p-4 bg-background-light dark:bg-background-dark shadow-sm">
+<img alt="iZwi Logo" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_pOQD51q3I4utHDxslkN1ZBiEl-4EUWUU_FQqCvGSavCkVmN-lbf04w7_Qh8qmxlpIxQojb1JpWBbWB1eiNFCNbgo9wGtZYgh8ApxzdC9NzEOlxHQUWlFF8metjKlTZAyDzSD4QMrQxzEdtnsbwKGkDUezK7Ll1FoufX6C2r39f4Mjp59oBfDyVtQB7yHBri-X5_zV2ASI6UP7U117eycls3T2YarZGCWiS_EwxzQMbhIKeFZw-2DLoO3ygX6j-W3d_i-i1TEpoU"/>
+<button class="p-2 rounded-full">
+<svg class="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</header>
+<main class="flex-1 flex flex-col overflow-hidden">
+<div class="h-1/2 relative">
+<img alt="Map of community with alert icons" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU80H9JDWlBex2T3WeB7nDboFebNqp7D2RrBWJm8QMC4VQyIoEUISP2Wt9KEGH5yQxKeQFRCTS7FzN_o6_VAYbDdB12TRVVCpPyh2hKpfk5x0pncnm5AcyvNcvbyG865HxLUVwCXfdY1dvXZTXllOMV5-6gkSFLbHj93r64dNbs10OQ3Mok3H8e7qM_rAEvnJgVreReWzM9InS9vD6QJq0hBNChJK844bX0o6hwdgCA4Qrvr5cIgCmV88__zhGYw9hKjX1m8hkCOE"/>
+</div>
+<div class="h-1/2 flex flex-col bg-white">
+<div class="p-4 border-b border-gray-200">
+<h2 class="font-display font-bold text-xl text-primary">Recent Alerts</h2>
+</div>
+<div class="flex-1 overflow-y-auto px-4 space-y-4 pt-4 pb-20">
+<div class="bg-white rounded-lg shadow-md flex flex-col border border-gray-200">
+<div class="p-4 flex-1">
+<div class="flex items-start justify-between mb-2">
+<div>
+<span class="inline-block bg-alert-crime/10 text-alert-crime text-xs font-semibold px-2.5 py-1 rounded-full font-body uppercase tracking-wider">Crime</span>
+<h3 class="font-display font-bold text-lg text-primary mt-1">Armed Robbery</h3>
+</div>
+<div class="text-right">
+<span class="text-sm text-text-secondary font-medium font-body">5 min ago</span>
+</div>
+</div>
+<p class="font-body text-text-primary dark:text-gray-300 text-sm mb-3">Suspects fled in a blue sedan.</p>
+<div class="flex items-center text-text-secondary text-sm">
+<span class="material-symbols-outlined text-base mr-1.5">location_on</span>
+<p class="font-body">Near Oak Street</p>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow-md flex flex-col border border-gray-200">
+<div class="p-4 flex-1">
+<div class="flex items-start justify-between mb-2">
+<div>
+<span class="inline-block bg-alert-utility/10 text-alert-utility text-xs font-semibold px-2.5 py-1 rounded-full font-body uppercase tracking-wider">Utility</span>
+<h3 class="font-display font-bold text-lg text-primary mt-1">Power Outage</h3>
+</div>
+<div class="text-right">
+<span class="text-sm text-text-secondary font-medium font-body">30 min ago</span>
+</div>
+</div>
+<p class="font-body text-text-primary dark:text-gray-300 text-sm mb-3">Unplanned power outage. Eskom has been notified.</p>
+<div class="flex items-center text-text-secondary text-sm">
+<span class="material-symbols-outlined text-base mr-1.5">location_on</span>
+<p class="font-body">North-West Quadrant</p>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow-md flex flex-col border border-gray-200">
+<div class="p-4 flex-1">
+<div class="flex items-start justify-between mb-2">
+<div>
+<span class="inline-block bg-alert-event/10 text-alert-event text-xs font-semibold px-2.5 py-1 rounded-full font-body uppercase tracking-wider">Event</span>
+<h3 class="font-display font-bold text-lg text-primary mt-1">Community Market</h3>
+</div>
+<div class="text-right">
+<span class="text-sm text-text-secondary font-medium font-body">2 hours ago</span>
+</div>
+</div>
+<p class="font-body text-text-primary dark:text-gray-300 text-sm mb-3">Join us for the weekly community market! From 9am to 2pm.</p>
+<div class="flex items-center text-text-secondary text-sm">
+<span class="material-symbols-outlined text-base mr-1.5">location_on</span>
+<p class="font-body">Community Park</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<button class="absolute bottom-6 right-6 bg-secondary text-primary h-16 w-16 rounded-full shadow-lg flex items-center justify-center">
+<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+
+</body></html>

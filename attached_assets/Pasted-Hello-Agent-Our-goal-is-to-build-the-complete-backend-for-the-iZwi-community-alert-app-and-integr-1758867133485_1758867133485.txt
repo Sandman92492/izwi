@@ -1,0 +1,35 @@
+Hello Agent,
+Our goal is to build the complete backend for the "iZwi" community alert app and integrate it with my existing frontend UI files.
+Context: I have already designed and coded 6 UI pages (landing/signup, login, dashboard, define community, post alert, and settings). I will provide these HTML files to you.
+Your Task: Create a full-stack application using the Python/Flask stack and a SQLite database. You will write all the necessary backend logic to make my UI fully functional.
+Please follow this development plan:
+1. Project Setup:
+Initialize a new Python Replit.
+Set up the standard Flask project structure (templates, static folders). I will upload my HTML files to the templates folder.
+Install all necessary packages, including Flask, Flask-Login, and werkzeug.
+2. Database Design:
+Create a database.py file to initialize a SQLite database named izwi.db.
+Design and create the schema with three tables:
+users: Must include id, email, password_hash, name, avatar_url, community_id, and a role (e.g., 'Admin', 'Member').
+communities: Must include id, name, admin_user_id, a unique invite_link_slug, and subscription_plan.
+alerts: Must include id, community_id, user_id, category, description, location data (latitude, longitude), a timestamp, and a status like is_resolved.
+3. Backend Logic & Routes (in main.py):
+User Authentication:
+Implement a full user authentication system using Flask-Login.
+Create a /login route that validates user credentials against the database and creates a session.
+Create a /signup route that handles new user registration, hashes passwords securely, and logs them in.
+Create a /logout route.
+Core Application Flow:
+New User Journey: After a new user signs up, redirect them to the /define-community page.
+Community Creation: The /define-community route should process the form, create a new community in the database, generate a unique invite slug, and assign the user as the admin of that community.
+Dashboard: The main /dashboard route should be login-protected. It must fetch all active alerts for the logged-in user's community from the database and pass them to the template for display.
+Alert Posting: Create a /post-alert route that handles the form submission from the "Post Alert" modal, saving the new alert to the database.
+Settings Page: The /settings route must fetch all data needed for that page: the community's invite link, a list of all members in the community, and the current subscription plan.
+Feature-Specific Logic:
+Member Removal: Implement a route (e.g., /remove-member/<id>) that allows a user with an 'Admin' role to remove another member from the community. This should update the user's community_id in the database.
+Invite System: Create a /join/<slug> route. When a new user visits this link, it should associate their sign-up with the community corresponding to the slug.
+4. Frontend Integration:
+Your final step is to make my HTML templates dynamic using Jinja2.
+Go through each template (dashboard.html, settings.html, etc.) and replace all hardcoded content (like alert descriptions, member names, and invite links) with dynamic Jinja2 variables passed from the backend routes you created.
+Ensure all HTML forms are correctly configured to POST to the appropriate backend routes.
+Please proceed with this plan. Start with the project setup and database schema, then build out the authentication and core application routes. I will be here to provide the UI files and clarify any requirements.

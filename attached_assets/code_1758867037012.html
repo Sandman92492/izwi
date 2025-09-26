@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>iZwi - Mobile Menu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Poppins:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#19b3a1",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#11211f",
+                        "text-light": "#11211f",
+                        "text-dark": "#f6f8f8",
+                        "subtext-light": "#6b7280",
+                        "subtext-dark": "#9ca3af",
+                        "border-light": "#e5e7eb",
+                        "border-dark": "#374151"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Poppins", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+<div class="min-h-screen">
+<header class="flex items-center p-4">
+<button class="p-2 rounded-full hover:bg-primary/10">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="flex-1 text-center font-body font-bold text-lg">Settings</h1>
+<div class="w-10"></div>
+</header>
+<main class="px-4 pb-8 space-y-8">
+<section>
+<h2 class="font-body font-semibold text-base mb-2">Invite Link</h2>
+<div class="bg-white dark:bg-background-dark/50 rounded-lg p-4 flex items-center justify-between shadow-sm border border-border-light dark:border-border-dark">
+<p class="truncate text-sm mr-4">https://izwi.app/invite/1234567890</p>
+<button class="bg-primary text-white font-body font-medium text-sm px-4 py-2 rounded-full hover:opacity-90 transition-opacity">
+                        Copy Link
+                    </button>
+</div>
+</section>
+<section>
+<h2 class="font-body font-semibold text-base mb-3">Members</h2>
+<div class="space-y-3">
+<div class="bg-white dark:bg-background-dark/50 rounded-lg p-3 flex items-center justify-between shadow-sm border border-border-light dark:border-border-dark">
+<div class="flex items-center gap-4">
+<img alt="Ethan Carter" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0oRwTVfWmjstaN79nDeWyB5HjsvxirGLxSjsmOsZm1aaUwnhNNv1dfm2WLXfBexbQprJggQZOnc-0b-WMBskYmb_mWDiRJFaRq2URIiyrn6asQo8agPYQuvthHmApYBKnPuWMuUEjhQRCKiCMFodHBAZiEcN7fgB6cSMw-CwuxTz-6AWGjyY7gvSQ8DI-exyNQ5mvunq0WO3T-MCUxSyKG-fm6zBMh1ae7nYJMCd3rEG7Zy-tm5oPWCJHJDx3_LytMZWWrZRq-Fc"/>
+<div>
+<p class="font-semibold">Ethan Carter</p>
+<p class="text-sm text-subtext-light dark:text-subtext-dark">Admin</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-background-dark/50 rounded-lg p-3 flex items-center justify-between shadow-sm border border-border-light dark:border-border-dark">
+<div class="flex items-center gap-4">
+<img alt="Sophia Bennett" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxF5VrQ-iQ33V3pm6407fzeX3JxQkqt7U8guiSyxrWUSB-rW9lpvR3go8cPJad-kMaHyHS8vHJqMEFscu79MKVdgfZ_yTPsF2zxqJP6rV3FDiOdOFzeZo0UwIyCnyJAjX0ItyJHdJ5fGyAMo_FKA9OLzXQdmvmWpGWy3I0-UWHocKmcLqHmrVOhaf2eR8D0-CFK8hZEXZ3oBRRIMSoW41xRPnQ6pTgydL5J_5R8wM7SQCPiEF1yW9DzlCBcserDEstqQ8phwCsPbo"/>
+<div>
+<p class="font-semibold">Sophia Bennett</p>
+<p class="text-sm text-subtext-light dark:text-subtext-dark">Member</p>
+</div>
+</div>
+<button class="bg-primary/20 dark:bg-primary/30 text-primary font-body font-medium text-sm px-4 py-2 rounded-full hover:bg-primary/30 dark:hover:bg-primary/40 transition">
+                            Remove
+                        </button>
+</div>
+<div class="bg-white dark:bg-background-dark/50 rounded-lg p-3 flex items-center justify-between shadow-sm border border-border-light dark:border-border-dark">
+<div class="flex items-center gap-4">
+<img alt="Liam Harper" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpIzDFAx2pTxt3mgHg4iVMKAhpj6mCNhSQz-ZGiusfyR3S2M-KTN2_lGnBDUGlhAaWtFB7vHUB8tziaq5MHgiY171PHCTAxwcJjL0yjckrtL6OKqz4tA8Ju1Yz36L-87VEHj_62a3v-VCkseNIvbRUv-ZSWQtOv7EppDQ04ulSRaRAKkinM7JFqy-dQ72NiK4tVsWxpDaDGXwC5D_5yFjaakw_QSKGbBdPO7Oc9Xf9RVggJZWiWVQEJs1E065xlWCvnF4HWn1IP1Q"/>
+<div>
+<p class="font-semibold">Liam Harper</p>
+<p class="text-sm text-subtext-light dark:text-subtext-dark">Member</p>
+</div>
+</div>
+<button class="bg-primary/20 dark:bg-primary/30 text-primary font-body font-medium text-sm px-4 py-2 rounded-full hover:bg-primary/30 dark:hover:bg-primary/40 transition">
+                            Remove
+                        </button>
+</div>
+<div class="bg-white dark:bg-background-dark/50 rounded-lg p-3 flex items-center justify-between shadow-sm border border-border-light dark:border-border-dark">
+<div class="flex items-center gap-4">
+<img alt="Olivia Hayes" class="w-12 h-12 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAo26fnFD_1ysWoqNezB0BkJVaW95W_AjhA7zAFguu9M8tMW-4OJccNMGT6DarKzEqyPAVLpnC-fFUWjgqt4kH07o2C0STI7koxbzG5AaZNhRaJ15Q30YPIfo52X0KGN5KjnsUI0yUkxCbec5sYy61F_kimckCVFdHyPo31QNhA9c53zwQVeknB5lb18QTXpZYOVBN080BqAbywoQZujwKjXL72Qrf8xVndokSmp2StrelvM56b4Int9Vge3ptVccWB4ObOyJSenOI"/>
+<div>
+<p class="font-semibold">Olivia Hayes</p>
+<p class="text-sm text-subtext-light dark:text-subtext-dark">Member</p>
+</div>
+</div>
+<button class="bg-primary/20 dark:bg-primary/30 text-primary font-body font-medium text-sm px-4 py-2 rounded-full hover:bg-primary/30 dark:hover:bg-primary/40 transition">
+                            Remove
+                        </button>
+</div>
+</div>
+</section>
+<section>
+<h2 class="font-body font-semibold text-base mb-3">Subscription</h2>
+<div class="bg-white dark:bg-background-dark/50 rounded-lg p-4 flex items-center justify-between shadow-sm border border-border-light dark:border-border-dark">
+<div>
+<p class="font-semibold">Current Plan</p>
+<p class="text-sm text-subtext-light dark:text-subtext-dark">Free</p>
+</div>
+<button class="bg-primary text-white font-body font-medium text-sm px-4 py-2 rounded-full hover:opacity-90 transition-opacity">
+                        Upgrade Plan
+                    </button>
+</div>
+</section>
+<section>
+<h2 class="font-body font-semibold text-base mb-3">Account</h2>
+<div class="bg-white dark:bg-background-dark/50 rounded-lg p-4 shadow-sm border border-border-light dark:border-border-dark">
+<button class="w-full text-left font-semibold text-red-500">Logout</button>
+</div>
+</section>
+</main>
+</div>
+
+</body></html>
