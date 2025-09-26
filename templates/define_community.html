@@ -40,6 +40,10 @@
       }
     </style>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 <style>
     body {
       min-height: max(884px, 100dvh);
@@ -65,34 +69,11 @@
 <input class="h-14 w-full rounded-lg border-none bg-subtle-light px-4 text-content-light placeholder-placeholder-light focus:ring-2 focus:ring-primary dark:bg-subtle-dark dark:text-content-dark dark:placeholder-placeholder-dark" id="community-name" name="community_name" placeholder="Community Name" type="text" required/>
 </div>
 <div class="relative flex-1 rounded-lg bg-subtle-light dark:bg-subtle-dark">
-<div class="absolute inset-0 z-0 bg-cover bg-center rounded-lg" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB_RlXTgEfNTPHQWNfQnynP81GQKqlQZ5DUV224Ar6RomGgbIniE_Jx8l-ff8fEKrKhiBY77H8FgyyzqH0snVvMQvnF8eRK1fiLdGdjVcN8wU2WwCY0wUX5zcoIHGCu2pOZvvmyaiW8GHSkiZTO-B7kvKG0mrFgn-k5yG1Qm5qaOm4paVmH9tfCLn6lqxrtFAdYuXZFIWV6IBrgJU2FA7fu82ZzhGp3h7hc7knqvcfBpCZGcbVKYEF742EdODN_P-VQKWOjN1R0BU0")'></div>
-<div class="relative z-10 flex h-full flex-col justify-between p-4">
-<p class="w-full rounded-lg bg-background-light/80 p-3 text-center text-sm text-content-light backdrop-blur-sm dark:bg-background-dark/80 dark:text-content-dark">
-              Use the tools to draw the borders of your community on the map.
+<div id="community-map" class="w-full h-full rounded-lg"></div>
+<div class="absolute top-3 left-3 bg-background-light/90 dark:bg-background-dark/90 p-3 rounded-lg shadow-lg text-sm z-10">
+<p class="text-content-light dark:text-content-dark">
+              Use the tools below to draw your community boundaries on the map.
             </p>
-<div class="flex items-center justify-between">
-<div class="flex gap-2">
-<button class="flex h-12 w-12 items-center justify-center rounded-full bg-background-light shadow-lg dark:bg-background-dark">
-<svg class="text-content-light dark:text-content-dark" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-<polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
-<line x1="12" x2="12" y1="22" y2="15.5"></line>
-<polyline points="22 8.5 12 15.5 2 8.5"></polyline>
-<polyline points="2 15.5 12 8.5 22 15.5"></polyline>
-</svg>
-</button>
-<button class="flex h-12 w-12 items-center justify-center rounded-full bg-background-light shadow-lg dark:bg-background-dark">
-<svg class="text-content-light dark:text-content-dark" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-</svg>
-</button>
-<button class="flex h-12 w-12 items-center justify-center rounded-full bg-background-light shadow-lg dark:bg-background-dark">
-<svg class="text-content-light dark:text-content-dark" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-<path d="M3 6h18"></path>
-<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-</svg>
-</button>
-</div>
-</div>
 </div>
 </div>
 </main>
@@ -104,5 +85,91 @@
 </footer>
 </div>
 
+<script>
+// Initialize the community boundary map
+var communityMap = L.map('community-map').setView([-26.2041, 28.0473], 13);
+
+// Add tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(communityMap);
+
+// Initialize the FeatureGroup to store editable layers
+var drawnItems = new L.FeatureGroup();
+communityMap.addLayer(drawnItems);
+
+// Initialize the draw control and pass it the FeatureGroup of editable layers
+var drawControl = new L.Control.Draw({
+    edit: {
+        featureGroup: drawnItems
+    },
+    draw: {
+        polygon: {
+            allowIntersection: false,
+            drawError: {
+                color: '#e1e100',
+                message: '<strong>Error:</strong> shape edges cannot cross!'
+            },
+            shapeOptions: {
+                color: '#2A9D8F',
+                fillOpacity: 0.2
+            }
+        },
+        polyline: false,
+        rectangle: {
+            shapeOptions: {
+                color: '#2A9D8F',
+                fillOpacity: 0.2
+            }
+        },
+        circle: {
+            shapeOptions: {
+                color: '#2A9D8F',
+                fillOpacity: 0.2
+            }
+        },
+        marker: false,
+        circlemarker: false
+    }
+});
+communityMap.addControl(drawControl);
+
+// Get user's current location for initial map center
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+        communityMap.setView([lat, lng], 15);
+    });
+}
+
+// Handle drawing events
+communityMap.on(L.Draw.Event.CREATED, function (e) {
+    var type = e.layerType,
+        layer = e.layer;
+
+    // Clear existing drawings (only allow one boundary)
+    drawnItems.clearLayers();
+    
+    // Add the new boundary
+    drawnItems.addLayer(layer);
+    
+    // Store boundary data (you can extend this to save to backend)
+    var boundaryData = layer.toGeoJSON();
+    console.log('Community boundary defined:', boundaryData);
+});
+
+communityMap.on(L.Draw.Event.EDITED, function (e) {
+    var layers = e.layers;
+    layers.eachLayer(function (layer) {
+        var boundaryData = layer.toGeoJSON();
+        console.log('Community boundary updated:', boundaryData);
+    });
+});
+
+communityMap.on(L.Draw.Event.DELETED, function (e) {
+    console.log('Community boundary deleted');
+});
+</script>
 
 </body></html>

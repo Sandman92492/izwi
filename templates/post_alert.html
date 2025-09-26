@@ -8,6 +8,8 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -48,32 +50,33 @@
 <div class="flex justify-center py-3">
 <div class="w-10 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
 </div>
-<div class="p-4 space-y-6">
+<form method="POST" action="{{ url_for('post_alert') }}" class="p-4 space-y-6">
 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Post a New Alert</h1>
 <div>
 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Category</h2>
+<input type="hidden" name="category" id="selected_category" required>
 <div class="grid grid-cols-2 gap-3">
-<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory('Emergency')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">warning</span>
 <span class="font-semibold text-gray-900 dark:text-white">Emergency</span>
 </button>
-<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory('Fire')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">local_fire_department</span>
 <span class="font-semibold text-gray-900 dark:text-white">Fire</span>
 </button>
-<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory('Traffic')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">directions_car</span>
 <span class="font-semibold text-gray-900 dark:text-white">Traffic</span>
 </button>
-<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory('Weather')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">filter_drama</span>
 <span class="font-semibold text-gray-900 dark:text-white">Weather</span>
 </button>
-<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory('Community')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">cottage</span>
 <span class="font-semibold text-gray-900 dark:text-white">Community</span>
 </button>
-<button class="flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
+<button type="button" onclick="selectCategory('Other')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
 <span class="material-symbols-outlined text-gray-700 dark:text-gray-300">help_outline</span>
 <span class="font-semibold text-gray-900 dark:text-white">Other</span>
 </button>
@@ -81,26 +84,86 @@
 </div>
 <div>
 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Describe what's happening...</h2>
-<textarea class="w-full h-28 p-3 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none resize-none" placeholder="Add details here..."></textarea>
+<textarea name="description" class="w-full h-28 p-3 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none resize-none" placeholder="Add details here..." required></textarea>
 </div>
 <div>
 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Location</h2>
 <div class="relative aspect-video w-full rounded-xl overflow-hidden group">
-<div class="w-full h-full bg-center bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC3cYRIvbODLbjWCHG0Nk83DYunHZAkmY6087t_H7gQpRS-KeeGuNVkp4Bh7L4FsKDzQypejV8b1066t8DFD-Fzw_6jWMxG3xuTv65u9iZr-9mX91ueuLRHcmzWZX4xj6HkjHL77jNwFGwszsk-b5Qukn1M_qefaG_P8I5_SPNNreEo_5WCr8_pU6xLGQpJZoPcJOXFB8JbzE7lTkP_mCcqzV0pBl7uV4BrR_HGIf8BIRHkBOVApkcPT18aAju-VDB3X6tkqQj9HHg");'></div>
-<div class="absolute inset-0 flex items-center justify-center">
-<span class="material-symbols-outlined text-5xl text-red-500 drop-shadow-lg">location_on</span>
-</div>
-<div class="absolute bottom-3 right-3 bg-white/80 dark:bg-black/60 p-2 rounded-full shadow-lg">
-<span class="material-symbols-outlined text-gray-800 dark:text-gray-200">drag_indicator</span>
+<div id="location-map" class="w-full h-full"></div>
+<div class="absolute top-3 left-3 bg-white/90 dark:bg-black/70 p-2 rounded-lg shadow-lg text-xs">
+<span class="text-gray-800 dark:text-gray-200">Click on the map to set location</span>
 </div>
 </div>
+<input type="hidden" name="latitude" id="latitude">
+<input type="hidden" name="longitude" id="longitude">
 </div>
-<button class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-opacity-90 transition-colors duration-200">
+<button type="submit" class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-opacity-90 transition-colors duration-200">
           Post Alert
         </button>
-</div>
+</form>
 <div class="h-5"></div>
 </div>
 </div>
+
+<script>
+// Initialize location map
+var locationMap = L.map('location-map').setView([-26.2041, 28.0473], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(locationMap);
+
+var selectedMarker = null;
+var selectedCategory = null;
+
+// Handle map clicks for location selection
+locationMap.on('click', function(e) {
+    var lat = e.latlng.lat;
+    var lng = e.latlng.lng;
+    
+    // Remove existing marker
+    if (selectedMarker) {
+        locationMap.removeLayer(selectedMarker);
+    }
+    
+    // Add new marker
+    selectedMarker = L.marker([lat, lng]).addTo(locationMap);
+    
+    // Update form fields
+    document.getElementById('latitude').value = lat;
+    document.getElementById('longitude').value = lng;
+});
+
+// Get user's current location
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+        
+        locationMap.setView([lat, lng], 15);
+        
+        // Add marker at current location
+        selectedMarker = L.marker([lat, lng]).addTo(locationMap);
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+    });
+}
+
+// Category selection
+function selectCategory(category) {
+    // Remove previous selection
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-white');
+        btn.classList.add('bg-white', 'dark:bg-background-dark');
+    });
+    
+    // Highlight selected category
+    event.target.closest('.category-btn').classList.add('bg-primary', 'text-white');
+    event.target.closest('.category-btn').classList.remove('bg-white', 'dark:bg-background-dark');
+    
+    // Update form field
+    document.getElementById('selected_category').value = category;
+    selectedCategory = category;
+}
+</script>
 
 </body></html>
