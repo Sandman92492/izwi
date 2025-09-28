@@ -1,32 +1,40 @@
 from datetime import datetime
 from flask import current_app
 from flask_login import current_user
-from database import get_db
+from app import db
+from models import Alert, User
 from utils import sanitize_plain_text, sanitize_text_input
 
 def get_community_alerts(community_id, include_resolved=False):
     """Get all alerts for a community"""
-    db = get_db()
-    cursor = db.cursor()
-    
-    query = '''
-        SELECT a.*, u.name as author_name
-        FROM alerts a
-        JOIN users u ON a.user_id = u.id
-        WHERE a.community_id = ?
-    '''
-    params = [community_id]
+    query = Alert.query.join(User, Alert.user_id == User.id).filter(Alert.community_id == community_id)
     
     if not include_resolved:
-        query += ' AND a.is_resolved = 0'
+        query = query.filter(Alert.is_resolved == False)
     
-    query += ' ORDER BY a.timestamp DESC'
+    alerts = query.order_by(Alert.timestamp.desc()).all()
     
-    cursor.execute(query, params)
-    alerts = cursor.fetchall()
-    return alerts
+    # Convert to format similar to old structure for compatibility
+    alert_data = []
+    for alert in alerts:
+        user = User.query.get(alert.user_id)
+        alert_dict = {
+            'id': alert.id,
+            'community_id': alert.community_id,
+            'user_id': alert.user_id,
+            'category': alert.category,
+            'description': alert.description,
+            'latitude': alert.latitude,
+            'longitude': alert.longitude,
+            'timestamp': alert.timestamp,
+            'is_resolved': alert.is_resolved,
+            'author_name': user.name if user else 'Unknown'
+        }
+        alert_data.append(alert_dict)
+    
+    return alert_data
 
-def create_alert(community_id, user_id, category, description, latitude=0, longitude=0):
+def create_alert(community_id, user_id, category, description, latitude=0.0, longitude=0.0):
     """Create a new alert"""
     # Validate input
     if not category or not description:
@@ -41,23 +49,28 @@ def create_alert(community_id, user_id, category, description, latitude=0, longi
     
     # Validate and parse coordinates
     try:
-        latitude = float(latitude) if latitude else 0
-        longitude = float(longitude) if longitude else 0
+        latitude = float(latitude) if latitude else 0.0
+        longitude = float(longitude) if longitude else 0.0
     except (ValueError, TypeError):
-        latitude = 0
-        longitude = 0
+        latitude = 0.0
+        longitude = 0.0
     
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('''
-        INSERT INTO alerts (community_id, user_id, category, description, latitude, longitude, timestamp, is_resolved)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (community_id, user_id, category, description, latitude, longitude, datetime.now(), 0))
+    # Create new alert
+    alert = Alert(
+        community_id=community_id,
+        user_id=user_id,
+        category=category,
+        description=description,
+        latitude=latitude,
+        longitude=longitude,
+        timestamp=datetime.now(),
+        is_resolved=False
+    )
     
-    alert_id = cursor.lastrowid
-    db.commit()
+    db.session.add(alert)
+    db.session.commit()
     
-    return alert_id, None
+    return alert.id, None
 
 def report_alert(alert_id, reporter_user):
     """Report an alert for inappropriate content"""

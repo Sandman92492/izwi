@@ -2,44 +2,15 @@ from datetime import datetime, timedelta
 from flask import session, request, redirect, url_for, flash
 from flask_login import UserMixin, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from database import get_db
+from app import db
+from models import User
 from utils import sanitize_plain_text, validate_email
 
-class User(UserMixin):
-    def __init__(self, id, email, name, avatar_url, community_id, role, business_id=None, subscription_tier='Free'):
-        self.id = id
-        self.email = email
-        self.name = name
-        self.avatar_url = avatar_url
-        self.community_id = community_id
-        self.role = role
-        self.business_id = business_id
-        self.subscription_tier = subscription_tier
-    
-    def is_business_user(self):
-        """Check if user is a business-level user"""
-        return self.role == 'Business' or self.business_id is not None
-    
-    def is_admin(self):
-        """Check if user is an admin"""
-        return self.role == 'Admin'
-    
-    def has_premium_access(self):
-        """Check if user has premium access"""
-        return self.subscription_tier == 'Premium' or self.role == 'Business'
+# User model methods moved to models.py
 
 def load_user(user_id):
     """Load user by ID for Flask-Login"""
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
-    user_data = cursor.fetchone()
-    if user_data:
-        # Handle both old and new database schemas gracefully
-        business_id = user_data[7] if len(user_data) > 7 else None
-        subscription_tier = user_data[8] if len(user_data) > 8 else 'Free'
-        return User(user_data[0], user_data[1], user_data[3], user_data[4], user_data[5], user_data[6], business_id, subscription_tier)
-    return None
+    return User.query.get(int(user_id))
 
 def check_session_timeout():
     """Check if the current session has timed out"""
@@ -81,16 +52,9 @@ def authenticate_user(email, password):
     # Sanitize email
     email = sanitize_plain_text(email.strip())
     
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
-    user_data = cursor.fetchone()
+    user = User.query.filter_by(email=email).first()
     
-    if user_data and check_password_hash(user_data[2], password):
-        # Handle both old and new database schemas gracefully
-        business_id = user_data[7] if len(user_data) > 7 else None
-        subscription_tier = user_data[8] if len(user_data) > 8 else 'Free'
-        user = User(user_data[0], user_data[1], user_data[3], user_data[4], user_data[5], user_data[6], business_id, subscription_tier)
+    if user and check_password_hash(user.password_hash, password):
         return user, None
     else:
         return None, 'Invalid email or password'
@@ -111,10 +75,7 @@ def create_user(email, password, community_id=None, business_id=None, role=None)
     email = sanitize_plain_text(email.strip())
     
     # Check if user already exists
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
-    if cursor.fetchone():
+    if User.query.filter_by(email=email).first():
         return None, 'Email already registered'
     
     # Determine user role and subscription tier
@@ -131,14 +92,18 @@ def create_user(email, password, community_id=None, business_id=None, role=None)
     # Create new user
     password_hash = generate_password_hash(password)
     
-    cursor.execute('''
-        INSERT INTO users (email, password_hash, name, avatar_url, community_id, role, business_id, subscription_tier)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (email, password_hash, '', '', community_id, role, business_id, subscription_tier))
+    user = User(
+        email=email,
+        password_hash=password_hash,
+        name='',
+        avatar_url='',
+        community_id=community_id,
+        role=role,
+        business_id=business_id,
+        subscription_tier=subscription_tier
+    )
     
-    user_id = cursor.lastrowid
-    db.commit()
+    db.session.add(user)
+    db.session.commit()
     
-    # Create user object
-    user = User(user_id, email, '', '', community_id, role, business_id, subscription_tier)
     return user, None

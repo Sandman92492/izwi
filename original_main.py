@@ -3,11 +3,9 @@ from datetime import timedelta
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 
-# Import the Flask app from app.py
-from app import app, db
-
 # Import our modular components
-from config import init_login_manager, init_csrf
+from config import create_app, init_login_manager, init_csrf
+from database import init_db
 from auth import load_user, check_session_activity, authenticate_user, create_user
 from community import (
     create_community, get_community_by_invite_slug, get_community_info, 
@@ -16,6 +14,9 @@ from community import (
 )
 from alerts import get_community_alerts, create_alert, report_alert
 from utils import get_category_color, get_category_icon, format_time_ago
+
+# Create Flask application
+app = create_app()
 
 # Initialize extensions
 login_manager = init_login_manager(app)
@@ -177,13 +178,16 @@ def welcome():
 @login_required
 def dashboard():
     # Refresh user data from database to ensure we have the latest community_id
-    from models import User
-    user_data = User.query.get(current_user.id)
+    from database import get_db
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT community_id, role FROM users WHERE id = ?', (current_user.id,))
+    user_data = cursor.fetchone()
     
-    if user_data and user_data.community_id:
+    if user_data and user_data[0]:
         # Update current user object with fresh data from database
-        current_user.community_id = user_data.community_id
-        current_user.role = user_data.role
+        current_user.community_id = user_data[0]
+        current_user.role = user_data[1]
     
     if not current_user.community_id:
         return redirect(url_for('define_community'))
@@ -351,5 +355,6 @@ def internal_error(error):
     return render_template('errors/500.html'), 500
 
 if __name__ == '__main__':
+    init_db()
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1', 'yes')
     app.run(host='0.0.0.0', port=5000, debug=debug_mode)

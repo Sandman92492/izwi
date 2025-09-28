@@ -12,6 +12,18 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), default='Member')
     business_id = db.Column(db.Integer, db.ForeignKey('business.id'))
     subscription_tier = db.Column(db.String(20), default='Free')
+    
+    def is_business_user(self):
+        """Check if user is a business-level user"""
+        return self.role == 'Business' or self.business_id is not None
+    
+    def is_admin(self):
+        """Check if user is an admin"""
+        return self.role == 'Admin'
+    
+    def has_premium_access(self):
+        """Check if user has premium access"""
+        return self.subscription_tier == 'Premium' or self.role == 'Business'
 
 
 class Community(db.Model):
