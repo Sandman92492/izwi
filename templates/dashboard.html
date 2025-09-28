@@ -74,11 +74,6 @@
             min-height: max(884px, 100dvh);
         }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
   </head>
 <body class="bg-background font-body text-text-primary">
 <div class="flex flex-col h-screen">
@@ -90,7 +85,7 @@
 </svg>
 </a>
 </header>
-<main class="flex-1 flex flex-col overflow-hidden">
+<main class="flex-1 flex flex-col min-h-0">
 <!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
@@ -133,10 +128,10 @@
   </div>
 </div>
 
-<div class="h-1/2 relative">
+<div class="flex-1 relative min-h-[250px] sm:min-h-[300px] md:min-h-[400px]">
 <div id="map" class="w-full h-full"></div>
 </div>
-<div class="h-1/2 flex flex-col bg-white">
+<div class="flex-1 flex flex-col bg-white min-h-[200px] sm:min-h-[250px] md:min-h-[300px]">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 <div class="p-4 border-b border-gray-200">
 <h2 class="font-display font-bold text-xl text-primary">Recent Alerts</h2>
@@ -385,6 +380,10 @@ document.addEventListener('DOMContentLoaded', function() {
             message.style.opacity = '0';
             setTimeout(function() {
                 message.remove();
+                // Refresh map size after layout change
+                if (typeof map !== 'undefined') {
+                    map.invalidateSize();
+                }
             }, 500);
         }, 5000);
     });
