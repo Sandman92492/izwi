@@ -49,7 +49,7 @@ csrf = CSRFProtect(app)
 def check_session_activity():
     """Check session timeout before each request to authenticated routes"""
     # Skip session timeout for certain routes that don't need authentication
-    if request.endpoint in ['index', 'signup_page', 'login', 'join_community', 'static']:
+    if request.endpoint in ['index', 'signup_page', 'login', 'join_community', 'static', 'privacy_policy', 'terms_of_service']:
         return
     
     # Check session timeout for authenticated users
@@ -301,6 +301,14 @@ def signup_submit():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+@app.route('/privacy')
+def privacy_policy():
+    return render_template('privacy_policy.html')
+
+@app.route('/terms')
+def terms_of_service():
+    return render_template('terms_of_service.html')
 
 @app.route('/define-community', methods=['GET', 'POST'])
 @login_required
