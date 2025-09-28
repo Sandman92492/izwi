@@ -18,13 +18,14 @@ app.permanent_session_lifetime = timedelta(days=30)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
 app.config['REMEMBER_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
 app.config['REMEMBER_COOKIE_HTTPONLY'] = True
+app.config['REMEMBER_COOKIE_REFRESH_EACH_REQUEST'] = False
 
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.remember_cookie_duration = timedelta(days=30)  # Remember for 30 days
-login_manager.session_protection = 'strong'
+login_manager.session_protection = None  # Disable for remember me to work properly
 
 class User(UserMixin):
     def __init__(self, id, email, name, avatar_url, community_id, role):
@@ -135,7 +136,11 @@ def login():
             
             # Handle "Remember me" functionality
             remember = request.form.get('remember') == 'on'
-            login_user(user, remember=remember)
+            login_user(user, remember=remember, duration=timedelta(days=30) if remember else None)
+            
+            # Make session permanent if remember me is checked
+            if remember:
+                session.permanent = True
             
             # Redirect based on whether user has a community
             if user.community_id:
