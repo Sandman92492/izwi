@@ -108,14 +108,6 @@
 </div>
 
 <script>
-// Initialize the map
-var map = L.map('map').setView([-26.2041, 28.0473], 13); // Default to Johannesburg
-
-// Add tile layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
 // Alert markers data
 var alerts = [
     {% for alert in alerts %}
@@ -129,6 +121,34 @@ var alerts = [
     }{% if not loop.last %},{% endif %}
     {% endfor %}
 ];
+
+// Calculate map center based on alerts
+var mapCenter = [-26.2041, 28.0473]; // Default to Johannesburg
+var mapZoom = 13;
+
+if (alerts.length > 0) {
+    // Filter alerts with valid coordinates
+    var validAlerts = alerts.filter(function(alert) {
+        return alert.lat !== -26.2041 || alert.lng !== 28.0473;
+    });
+    
+    if (validAlerts.length > 0) {
+        // Calculate average coordinates
+        var sumLat = validAlerts.reduce(function(sum, alert) { return sum + alert.lat; }, 0);
+        var sumLng = validAlerts.reduce(function(sum, alert) { return sum + alert.lng; }, 0);
+        
+        mapCenter = [sumLat / validAlerts.length, sumLng / validAlerts.length];
+        mapZoom = validAlerts.length === 1 ? 15 : 13; // Zoom closer for single alert
+    }
+}
+
+// Initialize the map with calculated center
+var map = L.map('map').setView(mapCenter, mapZoom);
+
+// Add tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
 
 // Add markers for each alert
 alerts.forEach(function(alert) {
@@ -144,6 +164,19 @@ alerts.forEach(function(alert) {
     marker.bindPopup('<div class="p-2"><strong>' + alert.category + '</strong><br>' + 
                      alert.description + '<br><small>' + alert.timestamp + '</small></div>');
 });
+
+// If no valid alerts, try to get user's location
+if (alerts.length === 0 || alerts.every(function(alert) { 
+    return alert.lat === -26.2041 && alert.lng === 28.0473; 
+})) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var userLat = position.coords.latitude;
+            var userLng = position.coords.longitude;
+            map.setView([userLat, userLng], 15);
+        });
+    }
+}
 
 function getCategoryIcon(category) {
     switch(category.toLowerCase()) {
