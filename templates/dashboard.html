@@ -189,6 +189,40 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
+// Community boundary variable
+var communityBoundary = null;
+
+// Load and display community boundary if available
+{% if boundary_data %}
+try {
+    var boundaryData = {{ boundary_data|tojson }};
+    if (boundaryData) {
+        var geoJsonData = JSON.parse(boundaryData);
+        
+        // Add boundary to map with styling
+        communityBoundary = L.geoJSON(geoJsonData, {
+            style: {
+                color: '#264653',
+                weight: 3,
+                opacity: 0.8,
+                fillColor: '#264653',
+                fillOpacity: 0.1,
+                dashArray: '5, 5'
+            }
+        }).addTo(map);
+        
+        // Fit map to boundary if no alerts or if alerts don't provide good bounds
+        if (alerts.length === 0) {
+            map.fitBounds(communityBoundary.getBounds(), {
+                padding: [20, 20]
+            });
+        }
+    }
+} catch (e) {
+    console.log('Error loading community boundary:', e);
+}
+{% endif %}
+
 // Add markers for each alert
 alerts.forEach(function(alert) {
     var categoryColor = getCategoryColor(alert.category);
