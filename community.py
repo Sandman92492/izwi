@@ -1,7 +1,8 @@
 import json
 from flask import session
 from flask_login import current_user
-from database import get_db
+from app import db
+from models import Community, User
 from utils import sanitize_plain_text, validate_json_data, generate_invite_slug
 
 def create_community(community_name, boundary_data='', business_id=None):
@@ -17,12 +18,8 @@ def create_community(community_name, boundary_data='', business_id=None):
     community_name = sanitize_plain_text(community_name.strip())
     boundary_data = validate_json_data(boundary_data)
     
-    db = get_db()
-    cursor = db.cursor()
-    
     # Check if community name already exists
-    cursor.execute('SELECT id FROM communities WHERE name = ?', (community_name,))
-    existing_community = cursor.fetchone()
+    existing_community = Community.query.filter_by(name=community_name).first()
     if existing_community:
         return None, 'A community with this name already exists. Please choose a different name.'
     
@@ -33,22 +30,27 @@ def create_community(community_name, boundary_data='', business_id=None):
     subscription_plan = 'Premium' if business_id else 'Free'
     
     # Create community
-    cursor.execute('''
-        INSERT INTO communities (name, admin_user_id, invite_link_slug, subscription_plan, boundary_data, business_id)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', (community_name, current_user.id, invite_slug, subscription_plan, boundary_data, business_id))
+    community = Community(
+        name=community_name,
+        admin_user_id=current_user.id,
+        invite_link_slug=invite_slug,
+        subscription_plan=subscription_plan,
+        boundary_data=boundary_data,
+        business_id=business_id
+    )
     
-    community_id = cursor.lastrowid
+    db.session.add(community)
+    db.session.flush()  # Get the ID
     
     # Update user with community_id and admin role
-    cursor.execute('''
-        UPDATE users SET community_id = ?, role = ?
-        WHERE id = ?
-    ''', (community_id, 'Admin', current_user.id))
+    user = User.query.get(current_user.id)
+    if user:
+        user.community_id = community.id
+        user.role = 'Admin'
     
-    db.commit()
+    db.session.commit()
     
-    return community_id, None
+    return community.id, None
 
 def get_community_by_invite_slug(invite_slug):
     """Get community by invite slug"""
