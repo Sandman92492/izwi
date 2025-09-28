@@ -223,9 +223,13 @@ def define_community():
         
         db.commit()
         
-        # Update current user object
+        # Update current user object and refresh the session
         current_user.community_id = community_id
         current_user.role = 'Admin'
+        
+        # Refresh the user session to ensure updated data persists
+        session['_user_id'] = str(current_user.id)
+        session.permanent = True
         
         # Boundary data is now stored in the database
         if boundary_data:
@@ -238,6 +242,17 @@ def define_community():
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    # Refresh user data from database to ensure we have the latest community_id
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT community_id, role FROM users WHERE id = ?', (current_user.id,))
+    user_data = cursor.fetchone()
+    
+    if user_data and user_data[0]:
+        # Update current user object with fresh data from database
+        current_user.community_id = user_data[0]
+        current_user.role = user_data[1]
+    
     if not current_user.community_id:
         return redirect(url_for('define_community'))
     
