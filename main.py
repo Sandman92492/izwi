@@ -249,10 +249,15 @@ def login():
 def signup_submit():
         email = sanitize_plain_text(request.form.get('email', '').strip())
         password = request.form.get('password', '')
+        consent = request.form.get('consent')
         
         # Validate input
         if not email or not password:
             flash('Email and password are required')
+            return redirect(url_for('signup_page'))
+        
+        if not consent:
+            flash('You must agree to the Terms of Service and Privacy Policy to sign up')
             return redirect(url_for('signup_page'))
         
         if not validate_email(email):
