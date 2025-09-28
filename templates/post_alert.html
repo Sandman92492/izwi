@@ -55,29 +55,29 @@
 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Category</h2>
 <input type="hidden" name="category" id="selected_category" required>
 <div class="grid grid-cols-2 gap-3">
-<button type="button" onclick="selectCategory(event, 'Emergency')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
-<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">warning</span>
-<span class="font-semibold text-gray-900 dark:text-white">Emergency</span>
+<button type="button" onclick="selectCategory(event, 'Emergency')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white border-2 border-gray-200 hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:outline-none">
+<span class="text-2xl">🚨</span>
+<span class="font-semibold text-gray-900">Emergency</span>
 </button>
-<button type="button" onclick="selectCategory(event, 'Fire')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
-<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">local_fire_department</span>
-<span class="font-semibold text-gray-900 dark:text-white">Fire</span>
+<button type="button" onclick="selectCategory(event, 'Fire')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white border-2 border-gray-200 hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+<span class="text-2xl">🔥</span>
+<span class="font-semibold text-gray-900">Fire</span>
 </button>
-<button type="button" onclick="selectCategory(event, 'Traffic')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
-<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">directions_car</span>
-<span class="font-semibold text-gray-900 dark:text-white">Traffic</span>
+<button type="button" onclick="selectCategory(event, 'Traffic')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white border-2 border-gray-200 hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+<span class="text-2xl">🚗</span>
+<span class="font-semibold text-gray-900">Traffic</span>
 </button>
-<button type="button" onclick="selectCategory(event, 'Weather')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
-<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">filter_drama</span>
-<span class="font-semibold text-gray-900 dark:text-white">Weather</span>
+<button type="button" onclick="selectCategory(event, 'Weather')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white border-2 border-gray-200 hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+<span class="text-2xl">⛈️</span>
+<span class="font-semibold text-gray-900">Weather</span>
 </button>
-<button type="button" onclick="selectCategory(event, 'Community')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
-<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">cottage</span>
-<span class="font-semibold text-gray-900 dark:text-white">Community</span>
+<button type="button" onclick="selectCategory(event, 'Community')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white border-2 border-gray-200 hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:outline-none">
+<span class="text-2xl">🏘️</span>
+<span class="font-semibold text-gray-900">Community</span>
 </button>
-<button type="button" onclick="selectCategory(event, 'Other')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white dark:bg-background-dark border border-gray-200 dark:border-gray-700 hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-2 focus:ring-primary focus:outline-none">
-<span class="material-symbols-outlined text-gray-700 dark:text-gray-300">help_outline</span>
-<span class="font-semibold text-gray-900 dark:text-white">Other</span>
+<button type="button" onclick="selectCategory(event, 'Other')" class="category-btn flex items-center gap-3 p-4 rounded-lg bg-white border-2 border-gray-200 hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-gray-500 focus:outline-none">
+<span class="text-2xl">❗</span>
+<span class="font-semibold text-gray-900">Other</span>
 </button>
 </div>
 </div>
@@ -151,15 +151,28 @@ if (navigator.geolocation) {
 
 // Category selection
 function selectCategory(event, category) {
+    // Get category colors
+    const colors = {
+        'Emergency': '#DC2626',
+        'Fire': '#EA580C', 
+        'Traffic': '#2563EB',
+        'Weather': '#7C3AED',
+        'Community': '#059669',
+        'Other': '#6B7280'
+    };
+    
     // Remove previous selection
     document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.classList.remove('bg-primary', 'text-white');
-        btn.classList.add('bg-white', 'dark:bg-background-dark');
+        btn.style.backgroundColor = 'white';
+        btn.style.borderColor = '#E5E7EB';
+        btn.style.color = '#111827';
     });
     
     // Highlight selected category
-    event.target.closest('.category-btn').classList.add('bg-primary', 'text-white');
-    event.target.closest('.category-btn').classList.remove('bg-white', 'dark:bg-background-dark');
+    const selectedBtn = event.target.closest('.category-btn');
+    selectedBtn.style.backgroundColor = colors[category];
+    selectedBtn.style.borderColor = colors[category];
+    selectedBtn.style.color = 'white';
     
     // Update form field
     document.getElementById('selected_category').value = category;

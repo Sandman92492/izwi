@@ -49,6 +49,51 @@ def generate_invite_slug():
     """Generate a unique invite slug for communities"""
     return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(10))
 
+def get_category_color(category):
+    """Get color for alert category"""
+    colors = {
+        'Emergency': '#DC2626',  # Red
+        'Fire': '#EA580C',       # Orange-red
+        'Traffic': '#2563EB',    # Blue
+        'Weather': '#7C3AED',    # Purple
+        'Community': '#059669',  # Green
+        'Other': '#6B7280'       # Gray
+    }
+    return colors.get(category, '#6B7280')
+
+def get_category_icon(category):
+    """Get emoji icon for alert category"""
+    icons = {
+        'Emergency': '🚨',
+        'Fire': '🔥',
+        'Traffic': '🚗',
+        'Weather': '⛈️',
+        'Community': '🏘️',
+        'Other': '❗'
+    }
+    return icons.get(category, '❗')
+
+def format_time_ago(timestamp_str):
+    """Format timestamp to relative time"""
+    try:
+        from datetime import datetime
+        timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+        now = datetime.now(timestamp.tzinfo) if timestamp.tzinfo else datetime.now()
+        diff = now - timestamp
+        
+        if diff.days > 0:
+            return f"{diff.days}d ago"
+        elif diff.seconds > 3600:
+            hours = diff.seconds // 3600
+            return f"{hours}h ago"
+        elif diff.seconds > 60:
+            minutes = diff.seconds // 60
+            return f"{minutes}m ago"
+        else:
+            return "Just now"
+    except:
+        return timestamp_str
+
 @app.route('/')
 def index():
     return render_template('home.html')
@@ -204,7 +249,10 @@ def dashboard():
     
     alerts = cursor.fetchall()
     
-    return render_template('dashboard.html', alerts=alerts)
+    return render_template('dashboard.html', alerts=alerts, 
+                         get_category_color=get_category_color, 
+                         get_category_icon=get_category_icon,
+                         format_time_ago=format_time_ago)
 
 @app.route('/post-alert', methods=['GET', 'POST'])
 @login_required

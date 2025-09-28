@@ -98,30 +98,42 @@
 <div class="p-4 border-b border-gray-200">
 <h2 class="font-display font-bold text-xl text-primary">Recent Alerts</h2>
 </div>
-<div class="flex-1 overflow-y-auto px-4 space-y-4 pt-4 pb-20">
+<div class="flex-1 overflow-y-auto p-4 space-y-3">
 {% for alert in alerts %}
-<div class="bg-white rounded-lg shadow-md flex flex-col border border-gray-200">
-<div class="p-4 flex-1">
-<div class="flex items-start justify-between mb-2">
+<div class="bg-white rounded-lg border-l-4 shadow-sm hover:shadow-md transition-shadow duration-200" 
+     style="border-left-color: {{ get_category_color(alert[3]) }}">
+<div class="p-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold" 
+     style="background-color: {{ get_category_color(alert[3]) }}">
+{{ get_category_icon(alert[3]) }}
+</div>
 <div>
-<span class="inline-block bg-alert-{{alert[3].lower()}}/10 text-alert-{{alert[3].lower()}} text-xs font-semibold px-2.5 py-1 rounded-full font-body uppercase tracking-wider">{{alert[3]}}</span>
-<h3 class="font-display font-bold text-lg text-primary mt-1">{{alert[4]}}</h3>
+<div class="flex items-center gap-2">
+<span class="font-semibold text-gray-900">{{ alert[3] }}</span>
+<span class="text-xs px-2 py-1 rounded-full text-gray-600 bg-gray-100">
+{{ format_time_ago(alert[7]) }}
+</span>
 </div>
-<div class="text-right">
-<span class="text-sm text-text-secondary font-medium font-body">{{alert[7]}}</span>
+<p class="text-sm text-gray-600 mt-1">{{ alert[4] }}</p>
 </div>
 </div>
-<p class="font-body text-text-primary dark:text-gray-300 text-sm mb-3">{{alert[4]}}</p>
-<div class="flex items-center text-text-secondary text-sm">
-<span class="material-symbols-outlined text-base mr-1.5">location_on</span>
-<p class="font-body">Lat: {{alert[5]}}, Lng: {{alert[6]}}</p>
+<div class="flex items-center text-xs text-gray-400">
+<span class="material-symbols-outlined text-sm mr-1">person</span>
+{{ alert[8] if alert[8] else 'Anonymous' }}
+</div>
 </div>
 </div>
 </div>
 {% endfor %}
 {% if not alerts %}
 <div class="text-center py-8">
-<p class="text-text-secondary">No alerts in your community yet.</p>
+<div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl text-gray-400">notifications_off</span>
+</div>
+<p class="text-gray-500">No recent alerts in your community.</p>
+<p class="text-sm text-gray-400 mt-1">Post the first alert to get started!</p>
 </div>
 {% endif %}
 </div>
