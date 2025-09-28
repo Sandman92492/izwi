@@ -139,30 +139,30 @@
 <div class="flex-1 overflow-y-auto p-4 space-y-3">
 {% for alert in alerts %}
 <div class="bg-white rounded-lg border-l-4 shadow-sm hover:shadow-md transition-shadow duration-200" 
-     style="border-left-color: {{ get_category_color(alert[3]) }}">
+     style="border-left-color: {{ get_category_color(alert['category']) }}">
 <div class="p-4">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-3">
 <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold" 
-     style="background-color: {{ get_category_color(alert[3]) }}">
-{{ get_category_icon(alert[3]) }}
+     style="background-color: {{ get_category_color(alert['category']) }}">
+{{ get_category_icon(alert['category']) }}
 </div>
 <div>
 <div class="flex items-center gap-2">
-<span class="font-semibold text-gray-900">{{ alert[3] }}</span>
+<span class="font-semibold text-gray-900">{{ alert['category'] }}</span>
 <span class="text-xs px-2 py-1 rounded-full text-gray-600 bg-gray-100">
-{{ format_time_ago(alert[7]) }}
+{{ format_time_ago(alert['timestamp']) }}
 </span>
 </div>
-<p class="text-sm text-gray-600 mt-1">{{ alert[4] }}</p>
+<p class="text-sm text-gray-600 mt-1">{{ alert['description'] }}</p>
 </div>
 </div>
 <div class="flex items-center justify-between">
 <div class="flex items-center text-xs text-gray-400">
 <span class="material-symbols-outlined text-sm mr-1">person</span>
-{{ alert[8] if alert[8] else 'Anonymous' }}
+{{ alert['author_name'] if alert['author_name'] else 'Anonymous' }}
 </div>
-<button onclick="reportAlert({{ alert[0] }})" 
+<button onclick="reportAlert({{ alert['id'] }})" 
         class="text-xs text-gray-400 hover:text-red-500 px-2 py-1 rounded hover:bg-gray-100 transition-colors duration-200"
         title="Report inappropriate content">
 <span class="material-symbols-outlined text-sm">flag</span>
@@ -197,12 +197,12 @@ Report
 [
     {% for alert in alerts %}
     {
-        "id": {{ alert.id if alert.id is not none else 0 }},
-        "category": "{{ alert.category if alert.category else 'Other' }}",
-        "description": "{{ (alert.description if alert.description else 'No description')|e }}",
-        "lat": {{ alert.latitude if alert.latitude is not none else -26.2041 }},
-        "lng": {{ alert.longitude if alert.longitude is not none else 26.889513 }},
-        "timestamp": "{{ alert.timestamp if alert.timestamp else 'Unknown time' }}"
+        "id": {{ alert['id'] if alert['id'] is not none else 0 }},
+        "category": "{{ alert['category'] if alert['category'] else 'Other' }}",
+        "description": "{{ (alert['description'] if alert['description'] else 'No description')|e }}",
+        "lat": {{ alert['latitude'] if alert['latitude'] is not none else -26.2041 }},
+        "lng": {{ alert['longitude'] if alert['longitude'] is not none else 26.889513 }},
+        "timestamp": "{{ alert['timestamp'] if alert['timestamp'] else 'Unknown time' }}"
     }{% if not loop.last %},{% endif %}
     {% endfor %}
 ]
