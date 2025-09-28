@@ -334,6 +334,14 @@ def define_community():
         # Create new community
         db = get_db()
         cursor = db.cursor()
+        
+        # Check if community name already exists
+        cursor.execute('SELECT id FROM communities WHERE name = ?', (community_name,))
+        existing_community = cursor.fetchone()
+        if existing_community:
+            flash('A community with this name already exists. Please choose a different name.')
+            return render_template('define_community.html')
+        
         invite_slug = generate_invite_slug()
         
         cursor.execute('''
