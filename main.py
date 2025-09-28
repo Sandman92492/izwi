@@ -1,185 +1,34 @@
 import os
-import sqlite3
-import secrets
-import string
-import re
-import json
-from datetime import datetime, timedelta
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from flask_wtf.csrf import CSRFProtect
-from werkzeug.security import generate_password_hash, check_password_hash
-import bleach
-from markupsafe import Markup
-from database import init_db, get_db
+from datetime import timedelta
+from flask import render_template, request, redirect, url_for, flash, session, jsonify
+from flask_login import login_user, logout_user, login_required, current_user
 
-app = Flask(__name__)
-app.secret_key = os.environ.get('SESSION_SECRET')
-if not app.secret_key:
-    raise ValueError("SESSION_SECRET environment variable is required")
+# Import our modular components
+from config import create_app, init_login_manager, init_csrf
+from database import init_db
+from auth import load_user, check_session_activity, authenticate_user, create_user
+from community import (
+    create_community, get_community_by_invite_slug, get_community_info, 
+    get_community_members, get_community_boundary_data, remove_member,
+    update_community_name, update_community_boundary
+)
+from alerts import get_community_alerts, create_alert, report_alert
+from utils import get_category_color, get_category_icon, format_time_ago
 
-# Enhanced security configuration
-is_production = os.environ.get('FLASK_ENV') == 'production'
-app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # CSRF token expires in 1 hour
-app.config['WTF_CSRF_SSL_STRICT'] = is_production
-app.config['SESSION_COOKIE_SECURE'] = is_production
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)  # Sessions expire after 24 hours
+# Create Flask application
+app = create_app()
 
-# Configure session for remember me functionality
-remember_duration = timedelta(days=7) if is_production else timedelta(days=3)  # Shorter in production
-app.permanent_session_lifetime = timedelta(hours=24)
-app.config['REMEMBER_COOKIE_DURATION'] = remember_duration
-app.config['REMEMBER_COOKIE_SECURE'] = is_production
-app.config['REMEMBER_COOKIE_HTTPONLY'] = True
-app.config['REMEMBER_COOKIE_REFRESH_EACH_REQUEST'] = False
-app.config['REMEMBER_COOKIE_SAMESITE'] = 'Lax'
+# Initialize extensions
+login_manager = init_login_manager(app)
+csrf = init_csrf(app)
 
-# Initialize Flask-Login
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-login_manager.login_message = "Please log in to access this page."
-login_manager.login_message_category = "info"
+# Set up user loader for Flask-Login
+login_manager.user_loader(load_user)
 
-# Initialize CSRF protection
-csrf = CSRFProtect(app)
+# Set up session activity check
+app.before_request(check_session_activity)
 
-@app.before_request
-def check_session_activity():
-    """Check session timeout before each request to authenticated routes"""
-    # Skip session timeout for certain routes that don't need authentication
-    if request.endpoint in ['index', 'signup_page', 'login', 'join_community', 'static', 'privacy_policy', 'terms_of_service']:
-        return
-    
-    # Check session timeout for authenticated users
-    if current_user.is_authenticated:
-        if check_session_timeout():
-            logout_user()
-            flash('Your session has expired. Please log in again.')
-            return redirect(url_for('login'))
-
-class User(UserMixin):
-    def __init__(self, id, email, name, avatar_url, community_id, role):
-        self.id = id
-        self.email = email
-        self.name = name
-        self.avatar_url = avatar_url
-        self.community_id = community_id
-        self.role = role
-
-@login_manager.user_loader
-def load_user(user_id):
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
-    user_data = cursor.fetchone()
-    if user_data:
-        return User(user_data[0], user_data[1], user_data[3], user_data[4], user_data[5], user_data[6])
-    return None
-
-def sanitize_text_input(text):
-    """Sanitize user text input to prevent XSS attacks"""
-    if not text:
-        return text
-    # Allow basic formatting but strip dangerous tags and attributes
-    allowed_tags = ['p', 'br', 'strong', 'em', 'u']
-    allowed_attributes = {}
-    return bleach.clean(text, tags=allowed_tags, attributes=allowed_attributes, strip=True)
-
-def sanitize_plain_text(text):
-    """Sanitize plain text input, removing all HTML tags"""
-    if not text:
-        return text
-    return bleach.clean(text, tags=[], attributes={}, strip=True)
-
-def validate_email(email):
-    """Validate email format"""
-    if not email:
-        return False
-    # Basic email validation pattern
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(pattern, email) is not None
-
-def validate_json_data(data):
-    """Validate and sanitize JSON data"""
-    if not data:
-        return ""
-    try:
-        import json
-        # Try to parse as JSON to validate format
-        parsed = json.loads(data)
-        # Re-serialize to ensure clean format
-        return json.dumps(parsed)
-    except (json.JSONDecodeError, ValueError):
-        # If not valid JSON, treat as plain text and sanitize
-        return sanitize_plain_text(data)
-
-def check_session_timeout():
-    """Check if the current session has timed out"""
-    try:
-        if 'last_activity' in session:
-            last_activity = datetime.fromisoformat(session['last_activity'])
-            if datetime.now() - last_activity > timedelta(hours=24):
-                session.clear()
-                return True
-        session['last_activity'] = datetime.now().isoformat()
-        return False
-    except (ValueError, TypeError):
-        # Handle malformed timestamp data
-        session.clear()
-        return True
-
-def generate_invite_slug():
-    """Generate a unique invite slug for communities"""
-    return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(10))
-
-def get_category_color(category):
-    """Get color for alert category"""
-    colors = {
-        'Emergency': '#DC2626',  # Red
-        'Fire': '#EA580C',       # Orange-red
-        'Traffic': '#2563EB',    # Blue
-        'Weather': '#7C3AED',    # Purple
-        'Community': '#059669',  # Green
-        'Other': '#6B7280'       # Gray
-    }
-    return colors.get(category, '#6B7280')
-
-def get_category_icon(category):
-    """Get emoji icon for alert category"""
-    icons = {
-        'Emergency': '🚨',
-        'Fire': '🔥',
-        'Traffic': '🚗',
-        'Weather': '⛈️',
-        'Community': '🏘️',
-        'Other': '❗'
-    }
-    return icons.get(category, '❗')
-
-def format_time_ago(timestamp_str):
-    """Format timestamp to relative time"""
-    try:
-        from datetime import datetime
-        timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
-        now = datetime.now(timestamp.tzinfo) if timestamp.tzinfo else datetime.now()
-        diff = now - timestamp
-        
-        if diff.days > 0:
-            return f"{diff.days}d ago"
-        elif diff.seconds > 3600:
-            hours = diff.seconds // 3600
-            return f"{hours}h ago"
-        elif diff.seconds > 60:
-            minutes = diff.seconds // 60
-            return f"{minutes}m ago"
-        else:
-            return "Just now"
-    except:
-        return timestamp_str
-
+# Routes
 @app.route('/')
 def index():
     return render_template('home.html')
@@ -191,11 +40,7 @@ def signup_page():
     invite = None
     
     if invite_slug:
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute('SELECT * FROM communities WHERE invite_link_slug = ?', (invite_slug,))
-        community = cursor.fetchone()
-        
+        community = get_community_by_invite_slug(invite_slug)
         if community:
             session['invite_community_id'] = community[0]
             invite = {
@@ -208,28 +53,15 @@ def signup_page():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = sanitize_plain_text(request.form.get('email', '').strip())
+        email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
         
-        # Validate input
-        if not email or not password:
-            flash('Email and password are required')
-            return render_template('login.html')
+        user, error = authenticate_user(email, password)
         
-        if not validate_email(email):
-            flash('Please enter a valid email address')
-            return render_template('login.html')
-        
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
-        user_data = cursor.fetchone()
-        
-        if user_data and check_password_hash(user_data[2], password):
-            user = User(user_data[0], user_data[1], user_data[3], user_data[4], user_data[5], user_data[6])
-            
+        if user:
             # Handle "Remember me" functionality
             remember = request.form.get('remember') == 'on'
+            remember_duration = timedelta(days=7) if os.environ.get('FLASK_ENV') == 'production' else timedelta(days=3)
             login_user(user, remember=remember, duration=remember_duration if remember else None)
             
             # Make session permanent if remember me is checked
@@ -245,69 +77,47 @@ def login():
             else:
                 return redirect(url_for('define_community'))
         else:
-            flash('Invalid email or password')
+            if error:
+                flash(error)
     
     return render_template('login.html')
 
 @app.route('/signup', methods=['POST'])
 def signup_submit():
-        email = sanitize_plain_text(request.form.get('email', '').strip())
-        password = request.form.get('password', '')
-        consent = request.form.get('consent')
-        
-        # Validate input
-        if not email or not password:
-            flash('Email and password are required')
-            return redirect(url_for('signup_page'))
-        
-        if not consent:
-            flash('You must agree to the Terms of Service and Privacy Policy to sign up')
-            return redirect(url_for('signup_page'))
-        
-        if not validate_email(email):
-            flash('Please enter a valid email address')
-            return redirect(url_for('signup_page'))
-        
-        if len(password) < 8:
-            flash('Password must be at least 8 characters long')
-            return redirect(url_for('signup_page'))
-        
-        # Check if user already exists
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
-        if cursor.fetchone():
-            flash('Email already registered')
-            return redirect(url_for('signup_page'))
-        
-        # Create new user
-        password_hash = generate_password_hash(password)
-        community_id = session.get('invite_community_id')  # From invite link
-        
-        cursor.execute('''
-            INSERT INTO users (email, password_hash, name, avatar_url, community_id, role)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (email, password_hash, '', '', community_id, 'Member' if community_id else 'Admin'))
-        
-        user_id = cursor.lastrowid
-        db.commit()
-        
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '')
+    consent = request.form.get('consent')
+    
+    # Check consent
+    if not consent:
+        flash('You must agree to the Terms of Service and Privacy Policy to sign up')
+        return redirect(url_for('signup_page'))
+    
+    # Get community ID from invite session
+    community_id = session.get('invite_community_id')
+    
+    user, error = create_user(email, password, community_id)
+    
+    if user:
         # Log in the new user
-        user = User(user_id, email, '', '', community_id, 'Member' if community_id else 'Admin')
         login_user(user)
         
         # Clear invite session
         session.pop('invite_community_id', None)
         
-        # Add success message and redirect based on whether they joined via invite
+        # Redirect based on whether they joined via invite
         if community_id:
             # Store user info for welcome screen
             session['new_user_welcome'] = True
-            session['user_name'] = email.split('@')[0].title()  # Use email username as name placeholder
+            session['user_name'] = email.split('@')[0].title()
             return redirect(url_for('welcome'))
         else:
             flash('Welcome! Your account has been created. Let\'s set up your community.', 'success')
             return redirect(url_for('define_community'))
+    else:
+        if error:
+            flash(error)
+        return redirect(url_for('signup_page'))
 
 @app.route('/logout')
 @login_required
@@ -327,58 +137,25 @@ def terms_of_service():
 @login_required
 def define_community():
     if request.method == 'POST':
-        community_name = sanitize_plain_text(request.form.get('community_name', '').strip())
-        boundary_data = validate_json_data(request.form.get('boundary_data', ''))
+        community_name = request.form.get('community_name', '').strip()
+        boundary_data = request.form.get('boundary_data', '')
         
-        # Validate input
-        if not community_name:
-            flash('Community name is required')
-            return render_template('define_community.html')
+        community_id, error = create_community(community_name, boundary_data)
         
-        if len(community_name) > 100:
-            flash('Community name must be less than 100 characters')
-            return render_template('define_community.html')
-        
-        # Create new community
-        db = get_db()
-        cursor = db.cursor()
-        
-        # Check if community name already exists
-        cursor.execute('SELECT id FROM communities WHERE name = ?', (community_name,))
-        existing_community = cursor.fetchone()
-        if existing_community:
-            flash('A community with this name already exists. Please choose a different name.')
-            return render_template('define_community.html')
-        
-        invite_slug = generate_invite_slug()
-        
-        cursor.execute('''
-            INSERT INTO communities (name, admin_user_id, invite_link_slug, subscription_plan, boundary_data)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (community_name, current_user.id, invite_slug, 'Free', boundary_data))
-        
-        community_id = cursor.lastrowid
-        
-        # Update user with community_id and admin role
-        cursor.execute('''
-            UPDATE users SET community_id = ?, role = ?
-            WHERE id = ?
-        ''', (community_id, 'Admin', current_user.id))
-        
-        db.commit()
-        
-        # Update current user object and refresh the session
-        current_user.community_id = community_id
-        current_user.role = 'Admin'
-        
-        # Refresh the user session to ensure updated data persists
-        session['_user_id'] = str(current_user.id)
-        session.permanent = True
-        
-        # Boundary data is now stored in the database
-        flash(f'Congratulations! Your community "{community_name}" has been created successfully.', 'success')
-        
-        return redirect(url_for('dashboard'))
+        if community_id:
+            # Update current user object and refresh the session
+            current_user.community_id = community_id
+            current_user.role = 'Admin'
+            
+            # Refresh the user session to ensure updated data persists
+            session['_user_id'] = str(current_user.id)
+            session.permanent = True
+            
+            flash(f'Congratulations! Your community "{community_name}" has been created successfully.', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            if error:
+                flash(error)
     
     return render_template('define_community.html')
 
@@ -401,6 +178,7 @@ def welcome():
 @login_required
 def dashboard():
     # Refresh user data from database to ensure we have the latest community_id
+    from database import get_db
     db = get_db()
     cursor = db.cursor()
     cursor.execute('SELECT community_id, role FROM users WHERE id = ?', (current_user.id,))
@@ -415,27 +193,13 @@ def dashboard():
         return redirect(url_for('define_community'))
     
     # Get community alerts
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('''
-        SELECT a.*, u.name as author_name
-        FROM alerts a
-        JOIN users u ON a.user_id = u.id
-        WHERE a.community_id = ? AND a.is_resolved = 0
-        ORDER BY a.timestamp DESC
-    ''', (current_user.community_id,))
-    
-    alerts = cursor.fetchall()
+    alerts = get_community_alerts(current_user.community_id)
     
     # Get community boundary data
-    cursor.execute('''
-        SELECT boundary_data FROM communities WHERE id = ?
-    ''', (current_user.community_id,))
+    boundary_data = get_community_boundary_data(current_user.community_id)
     
-    community_result = cursor.fetchone()
-    boundary_data = community_result[0] if community_result and community_result[0] else None
-    
-    return render_template('dashboard.html', alerts=alerts, 
+    return render_template('dashboard.html', 
+                         alerts=alerts, 
                          boundary_data=boundary_data,
                          get_category_color=get_category_color, 
                          get_category_icon=get_category_icon,
@@ -448,37 +212,34 @@ def post_alert():
         return redirect(url_for('define_community'))
     
     if request.method == 'POST':
-        category = sanitize_plain_text(request.form.get('category', ''))
-        description = sanitize_text_input(request.form.get('description', ''))
+        category = request.form.get('category', '')
+        description = request.form.get('description', '')
+        latitude = request.form.get('latitude', '0')
+        longitude = request.form.get('longitude', '0')
         
-        # Validate input
-        if not category or not description:
-            flash('Category and description are required')
-            return render_template('post_alert.html')
-        
-        if len(description) > 500:
-            flash('Description must be less than 500 characters')
-            return render_template('post_alert.html')
-        
-        # Validate and parse coordinates
+        # Convert coordinates to float
         try:
-            latitude = float(request.form.get('latitude', 0)) if request.form.get('latitude') else 0
-            longitude = float(request.form.get('longitude', 0)) if request.form.get('longitude') else 0
+            lat_float = float(latitude) if latitude else 0
+            lng_float = float(longitude) if longitude else 0
         except (ValueError, TypeError):
-            latitude = 0
-            longitude = 0
+            lat_float = 0
+            lng_float = 0
         
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute('''
-            INSERT INTO alerts (community_id, user_id, category, description, latitude, longitude, timestamp, is_resolved)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (current_user.community_id, current_user.id, category, description, latitude, longitude, datetime.now(), 0))
+        alert_id, error = create_alert(
+            current_user.community_id, 
+            current_user.id, 
+            category, 
+            description, 
+            lat_float, 
+            lng_float
+        )
         
-        db.commit()
-        
-        flash('Alert posted successfully!')
-        return redirect(url_for('dashboard'))
+        if alert_id:
+            flash('Alert posted successfully!')
+            return redirect(url_for('dashboard'))
+        else:
+            if error:
+                flash(error)
     
     return render_template('post_alert.html')
 
@@ -488,40 +249,22 @@ def settings():
     if not current_user.community_id:
         return redirect(url_for('define_community'))
     
-    db = get_db()
-    cursor = db.cursor()
-    
-    # Get community info
-    cursor.execute('SELECT * FROM communities WHERE id = ?', (current_user.community_id,))
-    community = cursor.fetchone()
-    
-    # Get all members
-    cursor.execute('SELECT * FROM users WHERE community_id = ?', (current_user.community_id,))
-    members = cursor.fetchall()
+    # Get community info and members
+    community = get_community_info(current_user.community_id)
+    members = get_community_members(current_user.community_id)
     
     return render_template('settings.html', community=community, members=members)
 
 @app.route('/remove-member/<int:member_id>')
 @login_required
-def remove_member(member_id):
-    if current_user.role != 'Admin':
-        flash('You do not have permission to remove members')
-        return redirect(url_for('settings'))
-    
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('UPDATE users SET community_id = NULL WHERE id = ?', (member_id,))
-    db.commit()
-    
-    flash('Member removed successfully')
+def remove_member_route(member_id):
+    success, message = remove_member(member_id, current_user)
+    flash(message)
     return redirect(url_for('settings'))
 
 @app.route('/join/<slug>')
 def join_community(slug):
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT id FROM communities WHERE invite_link_slug = ?', (slug,))
-    community = cursor.fetchone()
+    community = get_community_by_invite_slug(slug)
     
     if community:
         session['invite_community_id'] = community[0]
@@ -532,22 +275,18 @@ def join_community(slug):
 
 @app.route('/report-alert', methods=['POST'])
 @login_required
-def report_alert():
+def report_alert_route():
     """Handle alert reporting"""
     try:
         data = request.get_json()
         alert_id = data.get('alert_id')
         
-        if not alert_id:
-            return jsonify({'success': False, 'message': 'Alert ID is required'}), 400
+        success, message = report_alert(alert_id, current_user)
         
-        # Log the report action
-        app.logger.info(f'Alert {alert_id} reported by user {current_user.id} ({current_user.email}) at {datetime.utcnow()}')
-        
-        # In a production system, you would save this to a reports table
-        # For now, we're just logging as requested
-        
-        return jsonify({'success': True, 'message': 'Report submitted successfully'})
+        if success:
+            return jsonify({'success': True, 'message': message})
+        else:
+            return jsonify({'success': False, 'message': message}), 400
     
     except Exception as e:
         app.logger.error(f'Error processing alert report: {e}')
@@ -555,34 +294,19 @@ def report_alert():
 
 @app.route('/update-community-name', methods=['POST'])
 @login_required
-def update_community_name():
+def update_community_name_route():
     """Update community name (admin only)"""
-    if current_user.role != 'Admin':
-        return jsonify({'success': False, 'message': 'Admin access required'}), 403
-    
     try:
         data = request.get_json()
-        new_name = sanitize_plain_text(data.get('name', '').strip())
+        new_name = data.get('name', '')
         
-        if not new_name:
-            return jsonify({'success': False, 'message': 'Community name is required'}), 400
+        success, message = update_community_name(new_name, current_user.community_id, current_user)
         
-        if len(new_name) > 100:
-            return jsonify({'success': False, 'message': 'Community name must be less than 100 characters'}), 400
-        
-        # Check if name already exists (excluding current community)
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute('SELECT id FROM communities WHERE name = ? AND id != ?', (new_name, current_user.community_id))
-        if cursor.fetchone():
-            return jsonify({'success': False, 'message': 'A community with this name already exists'}), 400
-        
-        # Update community name
-        cursor.execute('UPDATE communities SET name = ? WHERE id = ?', (new_name, current_user.community_id))
-        db.commit()
-        
-        app.logger.info(f'Community {current_user.community_id} name updated to "{new_name}" by admin {current_user.id}')
-        return jsonify({'success': True, 'message': 'Community name updated successfully!'})
+        if success:
+            app.logger.info(f'Community {current_user.community_id} name updated to "{new_name}" by admin {current_user.id}')
+            return jsonify({'success': True, 'message': message})
+        else:
+            return jsonify({'success': False, 'message': message}), 400 if 'Admin access required' in message else 400
     
     except Exception as e:
         app.logger.error(f'Error updating community name: {e}')
@@ -590,70 +314,44 @@ def update_community_name():
 
 @app.route('/update-community-boundary', methods=['POST'])
 @login_required
-def update_community_boundary():
+def update_community_boundary_route():
     """Update community boundary (admin only)"""
-    if current_user.role != 'Admin':
-        return jsonify({'success': False, 'message': 'Admin access required'}), 403
-    
     try:
         data = request.get_json()
         boundary_data = data.get('boundary_data', '')
         
-        # Validate JSON if provided
-        if boundary_data:
-            try:
-                json.loads(boundary_data)  # Validate JSON format
-            except json.JSONDecodeError:
-                return jsonify({'success': False, 'message': 'Invalid boundary data format'}), 400
+        success, message = update_community_boundary(boundary_data, current_user.community_id, current_user)
         
-        # Update community boundary
-        db = get_db()
-        cursor = db.cursor()
-        cursor.execute('UPDATE communities SET boundary_data = ? WHERE id = ?', (boundary_data, current_user.community_id))
-        db.commit()
-        
-        app.logger.info(f'Community {current_user.community_id} boundary updated by admin {current_user.id}')
-        return jsonify({'success': True, 'message': 'Community boundary updated successfully!'})
+        if success:
+            app.logger.info(f'Community {current_user.community_id} boundary updated by admin {current_user.id}')
+            return jsonify({'success': True, 'message': message})
+        else:
+            return jsonify({'success': False, 'message': message}), 400 if 'Admin access required' in message else 400
     
     except Exception as e:
         app.logger.error(f'Error updating community boundary: {e}')
         return jsonify({'success': False, 'message': 'An error occurred while updating the community boundary'}), 500
 
-# Custom error handlers to hide technical details from users
-@app.errorhandler(404)
-def not_found_error(error):
-    """Handle 404 Not Found errors"""
-    return render_template('errors/404.html'), 404
+# Error handlers
+@app.errorhandler(400)
+def bad_request(error):
+    return render_template('errors/400.html'), 400
 
 @app.errorhandler(403)
-def forbidden_error(error):
-    """Handle 403 Forbidden errors"""
+def forbidden(error):
     return render_template('errors/403.html'), 403
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('errors/404.html'), 404
+
+@app.errorhandler(429)
+def rate_limit_exceeded(error):
+    return render_template('errors/429.html'), 429
 
 @app.errorhandler(500)
 def internal_error(error):
-    """Handle 500 Internal Server errors"""
-    # Log the error for debugging but don't show it to the user
-    app.logger.error(f'Server Error: {error}')
-    return render_template('errors/500.html'), 500
-
-@app.errorhandler(429)
-def too_many_requests_error(error):
-    """Handle 429 Too Many Requests errors"""
-    return render_template('errors/429.html'), 429
-
-@app.errorhandler(400)
-def bad_request_error(error):
-    """Handle 400 Bad Request errors"""
-    return render_template('errors/400.html'), 400
-
-# Global exception handler for any unhandled exceptions
-@app.errorhandler(Exception)
-def handle_exception(e):
-    """Handle any unhandled exceptions"""
-    # Log the error for debugging
-    app.logger.error(f'Unhandled Exception: {e}', exc_info=True)
-    # Return generic error page without technical details
+    app.logger.error(f'Unhandled Exception: {error}', exc_info=True)
     return render_template('errors/500.html'), 500
 
 if __name__ == '__main__':
