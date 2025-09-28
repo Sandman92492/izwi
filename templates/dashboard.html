@@ -193,42 +193,65 @@ Report
 </div>
 
 <script>
-// Alert markers data
-var alerts = [
-    {% for alert in alerts %}
-    {
-        id: {{ alert[0] }},
-        category: "{{ alert[3] }}",
-        description: "{{ alert[4] }}",
-        lat: {{ alert[5] if alert[5] else -26.2041 }},
-        lng: {{ alert[6] if alert[6] else 28.0473 }},
-        timestamp: "{{ alert[7] }}"
-    }{% if not loop.last %},{% endif %}
-    {% endfor %}
-];
-
-// Calculate map center based on alerts
-var mapCenter = [-26.2041, 28.0473]; // Default to Johannesburg
-var mapZoom = 13;
-
-if (alerts.length > 0) {
-    // Filter alerts with valid coordinates
-    var validAlerts = alerts.filter(function(alert) {
-        return alert.lat !== -26.2041 || alert.lng !== 28.0473;
-    });
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM ready, initializing map...');
     
-    if (validAlerts.length > 0) {
-        // Calculate average coordinates
-        var sumLat = validAlerts.reduce(function(sum, alert) { return sum + alert.lat; }, 0);
-        var sumLng = validAlerts.reduce(function(sum, alert) { return sum + alert.lng; }, 0);
-        
-        mapCenter = [sumLat / validAlerts.length, sumLng / validAlerts.length];
-        mapZoom = validAlerts.length === 1 ? 15 : 13; // Zoom closer for single alert
+    // Check if map container exists and has dimensions
+    var mapContainer = document.getElementById('map');
+    if (!mapContainer) {
+        console.error('Map container not found!');
+        return;
     }
-}
+    
+    console.log('Map container dimensions:', mapContainer.offsetWidth, 'x', mapContainer.offsetHeight);
+    
+    // Alert markers data
+    var alerts = [
+        {% for alert in alerts %}
+        {
+            id: {{ alert[0] }},
+            category: "{{ alert[3] }}",
+            description: "{{ alert[4] }}",
+            lat: {{ alert[5] if alert[5] else -26.2041 }},
+            lng: {{ alert[6] if alert[6] else 28.0473 }},
+            timestamp: "{{ alert[7] }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
 
-// Initialize the map with calculated center
-var map = L.map('map').setView(mapCenter, mapZoom);
+    console.log('Alerts data:', alerts);
+
+    // Calculate map center based on alerts
+    var mapCenter = [-26.2041, 28.0473]; // Default to Johannesburg
+    var mapZoom = 13;
+
+    if (alerts.length > 0) {
+        // Filter alerts with valid coordinates
+        var validAlerts = alerts.filter(function(alert) {
+            return alert.lat !== -26.2041 || alert.lng !== 28.0473;
+        });
+        
+        if (validAlerts.length > 0) {
+            // Calculate average coordinates
+            var sumLat = validAlerts.reduce(function(sum, alert) { return sum + alert.lat; }, 0);
+            var sumLng = validAlerts.reduce(function(sum, alert) { return sum + alert.lng; }, 0);
+            
+            mapCenter = [sumLat / validAlerts.length, sumLng / validAlerts.length];
+            mapZoom = validAlerts.length === 1 ? 15 : 13; // Zoom closer for single alert
+        }
+    }
+
+    console.log('Map center:', mapCenter, 'zoom:', mapZoom);
+
+    // Initialize the map with calculated center
+    try {
+        var map = L.map('map').setView(mapCenter, mapZoom);
+        console.log('Map initialized successfully');
+    } catch (e) {
+        console.error('Error initializing map:', e);
+        return;
+    }
 
 // Add tile layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -264,10 +287,10 @@ try {
             });
         }
     }
-} catch (e) {
-    console.log('Error loading community boundary:', e);
-}
-{% endif %}
+    } catch (e) {
+        console.log('Error loading community boundary:', e);
+    }
+    {% endif %}
 
 // Add markers for each alert
 alerts.forEach(function(alert) {
@@ -357,6 +380,9 @@ function reportAlert(alertId) {
         });
     }
 }
+
+    console.log('Map setup complete');
+});
 </script>
 
 <footer class="bg-background dark:bg-background-dark/50 py-4 mt-8">
