@@ -209,9 +209,9 @@ def define_community():
         invite_slug = generate_invite_slug()
         
         cursor.execute('''
-            INSERT INTO communities (name, admin_user_id, invite_link_slug, subscription_plan)
-            VALUES (?, ?, ?, ?)
-        ''', (community_name, current_user.id, invite_slug, 'Free'))
+            INSERT INTO communities (name, admin_user_id, invite_link_slug, subscription_plan, boundary_data)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (community_name, current_user.id, invite_slug, 'Free', boundary_data))
         
         community_id = cursor.lastrowid
         
@@ -227,9 +227,9 @@ def define_community():
         current_user.community_id = community_id
         current_user.role = 'Admin'
         
-        # Log boundary data for future use (could be stored in database)
+        # Boundary data is now stored in the database
         if boundary_data:
-            print(f"Community boundary data for {community_name}: {boundary_data}")
+            print(f"Community boundary data saved for {community_name}")
         
         return redirect(url_for('dashboard'))
     
