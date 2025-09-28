@@ -175,6 +175,25 @@ Remove
 </button>
 </div>
 <div class="p-4">
+<div class="mb-4 space-y-3">
+<div class="flex gap-2">
+<input id="addressSearch" type="text" placeholder="Search for address, city, or landmark..." 
+       class="flex-1 px-3 py-2 border border-border-light dark:border-border-dark rounded-lg focus:ring-primary focus:border-primary text-sm">
+<button onclick="searchAddress()" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 text-sm font-medium">
+Search
+</button>
+</div>
+<div class="flex gap-2">
+<button onclick="useMyLocation()" class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-sm">
+<span class="material-symbols-outlined text-sm">my_location</span>
+Use My Location
+</button>
+<button onclick="goToCommunityCenter()" class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-sm">
+<span class="material-symbols-outlined text-sm">home</span>
+Community Center
+</button>
+</div>
+</div>
 <div id="boundaryMap" style="height: 400px; width: 100%;"></div>
 <div class="mt-4 text-sm text-subtext-light dark:text-subtext-dark">
 <p class="mb-2">Use the drawing tools to define your community boundary:</p>
@@ -249,13 +268,16 @@ function closeBoundaryModal() {
 }
 
 function initBoundaryMap() {
-    // Initialize map
+    // Initialize map with default location
     boundaryMap = L.map('boundaryMap').setView([-26.2041, 28.0473], 13);
     
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(boundaryMap);
+    
+    // Try to use user's location first, then existing boundary, then default
+    getUserLocationAndCenter();
     
     // Create feature group for drawn items
     drawnItems = new L.FeatureGroup();
@@ -385,6 +407,146 @@ function saveBoundary() {
         alert('Error updating boundary');
     });
 }
+
+function getUserLocationAndCenter() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                boundaryMap.setView([lat, lng], 15);
+                
+                // Add a temporary marker to show user's location
+                L.marker([lat, lng]).addTo(boundaryMap)
+                    .bindPopup('Your current location')
+                    .openPopup();
+            },
+            function(error) {
+                console.log('Geolocation error:', error);
+                // If geolocation fails, try to center on existing boundary
+                centerOnExistingBoundary();
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+        );
+    } else {
+        // If geolocation not available, center on existing boundary
+        centerOnExistingBoundary();
+    }
+}
+
+function centerOnExistingBoundary() {
+    {% if community[5] %}
+    try {
+        var existingBoundary = {{ community[5]|safe }};
+        if (existingBoundary) {
+            var geoJsonData = JSON.parse(existingBoundary);
+            var layer = L.geoJSON(geoJsonData);
+            boundaryMap.fitBounds(layer.getBounds(), { padding: [20, 20] });
+            return;
+        }
+    } catch (e) {
+        console.log('Error loading existing boundary for centering:', e);
+    }
+    {% endif %}
+    // Default fallback - keep Johannesburg coordinates
+}
+
+function useMyLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                boundaryMap.setView([lat, lng], 16);
+                
+                // Remove any existing location markers
+                boundaryMap.eachLayer(function(layer) {
+                    if (layer instanceof L.Marker && layer.getPopup() && 
+                        layer.getPopup().getContent() === 'Your current location') {
+                        boundaryMap.removeLayer(layer);
+                    }
+                });
+                
+                // Add new location marker
+                L.marker([lat, lng]).addTo(boundaryMap)
+                    .bindPopup('Your current location')
+                    .openPopup();
+            },
+            function(error) {
+                alert('Unable to get your location. Please check your browser permissions.');
+            },
+            { enableHighAccuracy: true, timeout: 5000 }
+        );
+    } else {
+        alert('Geolocation is not supported by your browser.');
+    }
+}
+
+function goToCommunityCenter() {
+    {% if community[5] %}
+    try {
+        var existingBoundary = {{ community[5]|safe }};
+        if (existingBoundary) {
+            var geoJsonData = JSON.parse(existingBoundary);
+            var layer = L.geoJSON(geoJsonData);
+            boundaryMap.fitBounds(layer.getBounds(), { padding: [20, 20] });
+            return;
+        }
+    } catch (e) {
+        console.log('Error loading community boundary:', e);
+    }
+    {% endif %}
+    alert('No community boundary set yet. Draw a boundary first to use this feature.');
+}
+
+function searchAddress() {
+    const query = document.getElementById('addressSearch').value.trim();
+    if (!query) {
+        alert('Please enter an address or location to search for.');
+        return;
+    }
+    
+    // Use OpenStreetMap Nominatim for geocoding (free, no API key needed)
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=za`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                const result = data[0];
+                const lat = parseFloat(result.lat);
+                const lng = parseFloat(result.lon);
+                
+                boundaryMap.setView([lat, lng], 15);
+                
+                // Add a marker for the searched location
+                L.marker([lat, lng]).addTo(boundaryMap)
+                    .bindPopup(`Found: ${result.display_name}`)
+                    .openPopup();
+                    
+                // Clear the search box
+                document.getElementById('addressSearch').value = '';
+            } else {
+                alert('Location not found. Please try a different search term.');
+            }
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            alert('Error searching for location. Please try again.');
+        });
+}
+
+// Allow Enter key to trigger search
+document.addEventListener('DOMContentLoaded', function() {
+    const addressInput = document.getElementById('addressSearch');
+    if (addressInput) {
+        addressInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchAddress();
+            }
+        });
+    }
+});
 </script>
 
 </body></html>

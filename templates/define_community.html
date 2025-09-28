@@ -77,10 +77,25 @@ Sign in as different user
 <input type="hidden" name="boundary_data" id="boundary_data">
 </div>
 <div class="relative flex-1 rounded-lg bg-subtle-light dark:bg-subtle-dark">
+<div class="absolute top-3 left-3 right-3 z-20 space-y-2">
+<div class="flex gap-2">
+<input id="addressSearchDefine" type="text" placeholder="Search for address, city, or landmark..." 
+       class="flex-1 px-3 py-2 bg-background-light/95 dark:bg-background-dark/95 border border-subtle-light dark:border-subtle-dark rounded-lg focus:ring-primary focus:border-primary text-sm text-content-light dark:text-content-dark placeholder-placeholder-light dark:placeholder-placeholder-dark">
+<button type="button" onclick="searchAddressDefine()" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 text-sm font-medium">
+Search
+</button>
+</div>
+<div class="flex gap-2">
+<button type="button" onclick="useMyLocationDefine()" class="flex items-center gap-2 px-3 py-2 bg-background-light/95 dark:bg-background-dark/95 text-content-light dark:text-content-dark rounded-lg hover:bg-primary hover:text-white transition-colors text-sm">
+<span class="material-symbols-outlined text-sm">my_location</span>
+Use My Location
+</button>
+</div>
+</div>
 <div id="community-map" class="w-full h-full rounded-lg"></div>
-<div class="absolute top-3 left-3 bg-background-light/90 dark:bg-background-dark/90 p-3 rounded-lg shadow-lg text-sm z-10">
+<div class="absolute bottom-3 left-3 bg-background-light/90 dark:bg-background-dark/90 p-3 rounded-lg shadow-lg text-sm z-10">
 <p class="text-content-light dark:text-content-dark">
-              Use the tools below to draw your community boundaries on the map.
+              Use the drawing tools to define your community boundaries on the map.
             </p>
 </div>
 </div>
@@ -144,11 +159,23 @@ communityMap.addControl(drawControl);
 
 // Get user's current location for initial map center
 if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
-        communityMap.setView([lat, lng], 15);
-    });
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            communityMap.setView([lat, lng], 15);
+            
+            // Add a marker to show user's location
+            L.marker([lat, lng]).addTo(communityMap)
+                .bindPopup('Your current location')
+                .openPopup();
+        },
+        function(error) {
+            console.log('Geolocation error:', error);
+            // Stay with default coordinates if geolocation fails
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+    );
 }
 
 // Handle drawing events
@@ -180,6 +207,87 @@ communityMap.on(L.Draw.Event.EDITED, function (e) {
 communityMap.on(L.Draw.Event.DELETED, function (e) {
     document.getElementById('boundary_data').value = '';
     console.log('Community boundary deleted');
+});
+
+function useMyLocationDefine() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                communityMap.setView([lat, lng], 16);
+                
+                // Remove any existing location markers
+                communityMap.eachLayer(function(layer) {
+                    if (layer instanceof L.Marker && layer.getPopup() && 
+                        layer.getPopup().getContent() === 'Your current location') {
+                        communityMap.removeLayer(layer);
+                    }
+                });
+                
+                // Add new location marker
+                L.marker([lat, lng]).addTo(communityMap)
+                    .bindPopup('Your current location')
+                    .openPopup();
+            },
+            function(error) {
+                alert('Unable to get your location. Please check your browser permissions.');
+            },
+            { enableHighAccuracy: true, timeout: 5000 }
+        );
+    } else {
+        alert('Geolocation is not supported by your browser.');
+    }
+}
+
+function searchAddressDefine() {
+    const query = document.getElementById('addressSearchDefine').value.trim();
+    if (!query) {
+        alert('Please enter an address or location to search for.');
+        return;
+    }
+    
+    // Use OpenStreetMap Nominatim for geocoding (free, no API key needed)
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=za`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                const result = data[0];
+                const lat = parseFloat(result.lat);
+                const lng = parseFloat(result.lon);
+                
+                communityMap.setView([lat, lng], 15);
+                
+                // Add a marker for the searched location
+                L.marker([lat, lng]).addTo(communityMap)
+                    .bindPopup(`Found: ${result.display_name}`)
+                    .openPopup();
+                    
+                // Clear the search box
+                document.getElementById('addressSearchDefine').value = '';
+            } else {
+                alert('Location not found. Please try a different search term.');
+            }
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            alert('Error searching for location. Please try again.');
+        });
+}
+
+// Allow Enter key to trigger search
+document.addEventListener('DOMContentLoaded', function() {
+    const addressInput = document.getElementById('addressSearchDefine');
+    if (addressInput) {
+        addressInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent form submission
+                searchAddressDefine();
+            }
+        });
+    }
 });
 </script>
 
