@@ -1,0 +1,393 @@
+7The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+7The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+7The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+izwi:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+izwi:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+izwi:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+_app-cb6513906fbb8734.js:34 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+load-script.ts:58  GET https://cdn.segment.com/next-integrations/actions/tiktok-pixel/1526190d7b84ef9800b4.js net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ load-script.ts:58
+i @ load-script.ts:32
+(anonymous) @ index.ts:247
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+Vt @ index.ts:227
+(anonymous) @ index.ts:281
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+(anonymous) @ index.ts:274
+(anonymous) @ index.ts:274
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+Gt @ index.ts:268
+(anonymous) @ index.ts:171
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+s @ tslib.es6.js:73
+Promise.then
+a @ tslib.es6.js:76
+s @ tslib.es6.js:73
+Promise.then
+a @ tslib.es6.js:76
+(anonymous) @ tslib.es6.js:76
+u @ tslib.es6.js:72
+ne @ index.ts:116
+(anonymous) @ index.ts:304
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+s @ tslib.es6.js:73
+Promise.then
+a @ tslib.es6.js:76
+(anonymous) @ tslib.es6.js:76
+u @ tslib.es6.js:72
+re @ index.ts:239
+(anonymous) @ index.ts:338
+Promise.then
+(anonymous) @ index.ts:339
+t @ index.ts:307
+n @ index.ts:337
+n.load @ index.ts:389
+n.standalone @ index.ts:393
+(anonymous) @ standalone-analytics.ts:53
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+se @ standalone-analytics.ts:49
+(anonymous) @ standalone.ts:69
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+de @ sdk.min.js:1
+(anonymous) @ sdk.min.js:1
+(anonymous) @ sdk.min.js:1
+(anonymous) @ sdk.min.js:1
+_app-cb6513906fbb8734.js:34 Failed to create PluginFactory {name: 'TikTok Pixel', creationName: 'TikTok Pixel', libraryName: 'tiktok-pixelDestination', url: 'https://cdn.segment.com/next-integrations/actions/tiktok-pixel/1526190d7b84ef9800b4.js', settings: {…}}
+(anonymous) @ _app-cb6513906fbb8734.js:34
+(anonymous) @ index.ts:256
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+u @ tslib.es6.js:74
+Promise.then
+a @ tslib.es6.js:76
+(anonymous) @ tslib.es6.js:76
+u @ tslib.es6.js:72
+Vt @ index.ts:227
+(anonymous) @ index.ts:281
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+(anonymous) @ index.ts:274
+(anonymous) @ index.ts:274
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+Gt @ index.ts:268
+(anonymous) @ index.ts:171
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+s @ tslib.es6.js:73
+Promise.then
+a @ tslib.es6.js:76
+s @ tslib.es6.js:73
+Promise.then
+a @ tslib.es6.js:76
+(anonymous) @ tslib.es6.js:76
+u @ tslib.es6.js:72
+ne @ index.ts:116
+(anonymous) @ index.ts:304
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+s @ tslib.es6.js:73
+Promise.then
+a @ tslib.es6.js:76
+(anonymous) @ tslib.es6.js:76
+u @ tslib.es6.js:72
+re @ index.ts:239
+(anonymous) @ index.ts:338
+Promise.then
+(anonymous) @ index.ts:339
+t @ index.ts:307
+n @ index.ts:337
+n.load @ index.ts:389
+n.standalone @ index.ts:393
+(anonymous) @ standalone-analytics.ts:53
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+se @ standalone-analytics.ts:49
+(anonymous) @ standalone.ts:69
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+de @ sdk.min.js:1
+(anonymous) @ sdk.min.js:1
+(anonymous) @ sdk.min.js:1
+(anonymous) @ sdk.min.js:1
+_app-cb6513906fbb8734.js:34 Failed to load Remote Plugin Error: Failed to load https://cdn.segment.com/next-integrations/actions/tiktok-pixel/1526190d7b84ef9800b4.js
+    at o.onerror (load-script.ts:53:24)
+(anonymous) @ _app-cb6513906fbb8734.js:34
+(anonymous) @ index.ts:311
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+u @ tslib.es6.js:74
+Promise.then
+a @ tslib.es6.js:76
+(anonymous) @ tslib.es6.js:76
+u @ tslib.es6.js:72
+(anonymous) @ index.ts:274
+(anonymous) @ index.ts:274
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+Gt @ index.ts:268
+(anonymous) @ index.ts:171
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+s @ tslib.es6.js:73
+Promise.then
+a @ tslib.es6.js:76
+s @ tslib.es6.js:73
+Promise.then
+a @ tslib.es6.js:76
+(anonymous) @ tslib.es6.js:76
+u @ tslib.es6.js:72
+ne @ index.ts:116
+(anonymous) @ index.ts:304
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+s @ tslib.es6.js:73
+Promise.then
+a @ tslib.es6.js:76
+(anonymous) @ tslib.es6.js:76
+u @ tslib.es6.js:72
+re @ index.ts:239
+(anonymous) @ index.ts:338
+Promise.then
+(anonymous) @ index.ts:339
+t @ index.ts:307
+n @ index.ts:337
+n.load @ index.ts:389
+n.standalone @ index.ts:393
+(anonymous) @ standalone-analytics.ts:53
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+se @ standalone-analytics.ts:49
+(anonymous) @ standalone.ts:69
+(anonymous) @ tslib.es6.js:103
+(anonymous) @ tslib.es6.js:108
+(anonymous) @ tslib.es6.js:80
+u @ tslib.es6.js:72
+de @ sdk.min.js:1
+(anonymous) @ sdk.min.js:1
+(anonymous) @ sdk.min.js:1
+(anonymous) @ sdk.min.js:1
+_app-cb6513906fbb8734.js:34 [LaunchDarkly] LaunchDarkly client initialized
+framework-5da946dc1c3bda9d.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'battery'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+framework-5da946dc1c3bda9d.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-5da946dc1c3bda9d.js:1
+(anonymous) @ framework-5da946dc1c3bda9d.js:1
+uD @ framework-5da946dc1c3bda9d.js:1
+uI @ framework-5da946dc1c3bda9d.js:1
+uM @ framework-5da946dc1c3bda9d.js:1
+uS @ framework-5da946dc1c3bda9d.js:1
+C @ framework-5da946dc1c3bda9d.js:1
+z @ framework-5da946dc1c3bda9d.js:1
+becad483-73cd-4a7b-9eb7-95ca4e20f8c8-00-1rcczl20iigmc.riker.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+becad483-73cd-4a7b-9eb7-95ca4e20f8c8-00-1rcczl20iigmc.riker.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'ambient-light-sensor'.
+becad483-73cd-4a7b-9eb7-95ca4e20f8c8-00-1rcczl20iigmc.riker.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'battery'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html?initialPath=%2F&id=%3Arl%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+_app-cb6513906fbb8734.js:34  POST https://events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820 net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ _app-cb6513906fbb8734.js:34
+(anonymous) @ _app-cb6513906fbb8734.js:34
+promise @ _app-cb6513906fbb8734.js:36
+(anonymous) @ _app-cb6513906fbb8734.js:36
+r.httpRequest @ _app-cb6513906fbb8734.js:36
+t @ _app-cb6513906fbb8734.js:36
+a.sendChunk @ _app-cb6513906fbb8734.js:36
+a.sendEvents @ _app-cb6513906fbb8734.js:36
+a.flush @ _app-cb6513906fbb8734.js:36
+e @ _app-cb6513906fbb8734.js:36
+n @ _app-cb6513906fbb8734.js:34
+setTimeout
+(anonymous) @ _app-cb6513906fbb8734.js:34
+a.start @ _app-cb6513906fbb8734.js:36
+start @ _app-cb6513906fbb8734.js:36
+n @ _app-cb6513906fbb8734.js:34
+_app-cb6513906fbb8734.js:34  POST https://events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820 net::ERR_BLOCKED_BY_CLIENT
