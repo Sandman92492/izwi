@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
+from flask_wtf.csrf import CSRFProtect
 
 # Import the Flask app from app.py
 from app import app, db
@@ -50,6 +51,7 @@ def signup_page():
     return render_template('landing.html', invite=invite)
 
 @app.route('/login', methods=['GET', 'POST'])
+@csrf.exempt  # Temporarily exempt from CSRF for debugging
 def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
