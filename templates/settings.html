@@ -59,10 +59,10 @@
 {% if current_user.role == 'Admin' %}
 <div class="flex items-center justify-center gap-2 mt-1">
 <span class="bg-primary text-white text-xs px-2 py-1 rounded-full font-medium">ADMIN</span>
-<span class="text-xs text-subtext-light dark:text-subtext-dark">{{ community[1] }}</span>
+<span class="text-xs text-subtext-light dark:text-subtext-dark">{{ community.name }}</span>
 </div>
 {% else %}
-<span class="text-xs text-subtext-light dark:text-subtext-dark">{{ community[1] }} • Member</span>
+<span class="text-xs text-subtext-light dark:text-subtext-dark">{{ community.name }} • Member</span>
 {% endif %}
 </div>
 <div class="w-10"></div>
@@ -95,7 +95,7 @@ Community Management
 <div class="bg-white dark:bg-background-dark/50 rounded-lg p-3 flex items-center justify-between">
 <div>
 <p class="font-semibold text-sm">Community Name</p>
-<p class="text-xs text-subtext-light dark:text-subtext-dark">{{ community[1] }}</p>
+<p class="text-xs text-subtext-light dark:text-subtext-dark">{{ community.name }}</p>
 </div>
 <button onclick="editCommunityName()" class="bg-primary text-white text-xs px-3 py-2 rounded-full hover:opacity-90">
 Edit
@@ -116,7 +116,7 @@ Edit Boundary
 <section>
 <h2 class="font-body font-semibold text-base mb-2">Invite Link</h2>
 <div class="bg-white dark:bg-background-dark/50 rounded-lg p-4 flex items-center justify-between shadow-sm border border-border-light dark:border-border-dark">
-<p class="truncate text-sm mr-4">{{ request.host_url }}join/{{ community[3] }}</p>
+<p class="truncate text-sm mr-4">{{ request.host_url }}join/{{ community.invite_link_slug }}</p>
 <button class="bg-primary text-white font-body font-medium text-sm px-4 py-2 rounded-full hover:opacity-90 transition-opacity">
                         Copy Link
                     </button>
@@ -129,15 +129,15 @@ Edit Boundary
 <div class="bg-white dark:bg-background-dark/50 rounded-lg p-3 flex items-center justify-between shadow-sm border border-border-light dark:border-border-dark">
 <div class="flex items-center gap-4">
 <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-<span class="text-primary font-semibold">{{ member[3][:1] if member[3] else member[1][:1] }}</span>
+<span class="text-primary font-semibold">{{ member.name[:1] if member.name else member.email[:1] }}</span>
 </div>
 <div>
-<p class="font-semibold">{{ member[3] if member[3] else member[1] }}</p>
-<p class="text-sm text-subtext-light dark:text-subtext-dark">{{ member[6] }}</p>
+<p class="font-semibold">{{ member.name if member.name else member.email }}</p>
+<p class="text-sm text-subtext-light dark:text-subtext-dark">{{ member.role }}</p>
 </div>
 </div>
-{% if member[6] != 'Admin' and current_user.role == 'Admin' %}
-<a href="{{ url_for('remove_member', member_id=member[0]) }}" class="bg-primary/20 dark:bg-primary/30 text-primary font-body font-medium text-sm px-4 py-2 rounded-full hover:bg-primary/30 dark:hover:bg-primary/40 transition">
+{% if member.role != 'Admin' and current_user.role == 'Admin' %}
+<a href="{{ url_for('remove_member_route', member_id=member.id) }}" class="bg-primary/20 dark:bg-primary/30 text-primary font-body font-medium text-sm px-4 py-2 rounded-full hover:bg-primary/30 dark:hover:bg-primary/40 transition">
 Remove
 </a>
 {% endif %}
@@ -155,7 +155,7 @@ Remove
 <div class="bg-white dark:bg-background-dark/50 rounded-lg p-4 flex items-center justify-between shadow-sm border border-border-light dark:border-border-dark">
 <div>
 <p class="font-semibold">Current Plan</p>
-<p class="text-sm text-subtext-light dark:text-subtext-dark">{{ community[4] }}</p>
+<p class="text-sm text-subtext-light dark:text-subtext-dark">{{ community.subscription_plan }}</p>
 </div>
 <button class="bg-primary text-white font-body font-medium text-sm px-4 py-2 rounded-full hover:opacity-90 transition-opacity">
                         Upgrade Plan
@@ -254,7 +254,7 @@ Save Boundary
 <div class="p-4">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 <label class="block text-sm font-medium mb-2">Community Name</label>
-<input id="communityNameInput" type="text" value="{{ community[1] }}" 
+<input id="communityNameInput" type="text" value="{{ community.name }}" 
        class="w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-lg focus:ring-primary focus:border-primary">
 <div class="mt-4 flex gap-3 justify-end">
 <button onclick="closeNameModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium">
@@ -328,9 +328,9 @@ function initBoundaryMap() {
     boundaryMap.addControl(drawControl);
     
     // Load existing boundary if available
-    {% if community[5] %}
+    {% if community.boundary_data %}
     try {
-        var existingBoundary = {{ community[5]|safe }};
+        var existingBoundary = {{ community.boundary_data|safe }};
         if (existingBoundary) {
             var geoJsonData = JSON.parse(existingBoundary);
             var layer = L.geoJSON(geoJsonData);
@@ -504,9 +504,9 @@ function getUserLocationAndCenter() {
 }
 
 function centerOnExistingBoundary() {
-    {% if community[5] %}
+    {% if community.boundary_data %}
     try {
-        var existingBoundary = {{ community[5]|safe }};
+        var existingBoundary = {{ community.boundary_data|safe }};
         if (existingBoundary) {
             var geoJsonData = JSON.parse(existingBoundary);
             var layer = L.geoJSON(geoJsonData);
@@ -552,9 +552,9 @@ function useMyLocation() {
 }
 
 function goToCommunityCenter() {
-    {% if community[5] %}
+    {% if community.boundary_data %}
     try {
-        var existingBoundary = {{ community[5]|safe }};
+        var existingBoundary = {{ community.boundary_data|safe }};
         if (existingBoundary) {
             var geoJsonData = JSON.parse(existingBoundary);
             var layer = L.geoJSON(geoJsonData);
