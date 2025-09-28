@@ -15,6 +15,9 @@ A Flask-based community alert system that allows users to create and join commun
 - **2025-09-26**: Community boundary drawing with Leaflet Draw tools
 - **2025-09-26**: Separated home screen from sign-up page for better user experience
 - **2025-09-26**: Added clear sign-in option for existing users on home and sign-up pages
+- **2025-09-28**: Color-coded alert system with simplified card design and emoji icons
+- **2025-09-28**: Enhanced map markers with larger, more visible category-specific pins
+- **2025-09-28**: Community boundary display on dashboard map with persistent storage
 
 ## Project Architecture
 ### Backend Structure
@@ -31,7 +34,7 @@ A Flask-based community alert system that allows users to create and join commun
 
 ### Database Schema
 - **users**: id, email, password_hash, name, avatar_url, community_id, role
-- **communities**: id, name, admin_user_id, invite_link_slug, subscription_plan
+- **communities**: id, name, admin_user_id, invite_link_slug, subscription_plan, boundary_data
 - **alerts**: id, community_id, user_id, category, description, latitude, longitude, timestamp, is_resolved
 
 ### Key Features
@@ -44,7 +47,9 @@ A Flask-based community alert system that allows users to create and join commun
   - Click-to-set location selection for posting alerts
   - Automatic geolocation support for user's current position
   - Community boundary drawing tools with polygon/circle/rectangle options
+  - **Community boundary display**: Boundaries drawn during creation are stored and displayed on dashboard
   - Real-time map interactions with popups showing alert details
+  - Automatic map fitting to community boundaries when no alerts are present
 - Member management with admin controls
 - Community invitation system via unique URL slugs
 - Responsive design with Tailwind CSS
