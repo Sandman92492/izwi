@@ -36,9 +36,17 @@ def init_db():
             admin_user_id INTEGER NOT NULL,
             invite_link_slug TEXT UNIQUE NOT NULL,
             subscription_plan TEXT DEFAULT 'Free',
+            boundary_data TEXT,
             FOREIGN KEY (admin_user_id) REFERENCES users (id)
         )
     ''')
+    
+    # Add boundary_data column if it doesn't exist (for existing databases)
+    try:
+        cursor.execute('ALTER TABLE communities ADD COLUMN boundary_data TEXT')
+    except sqlite3.OperationalError:
+        # Column already exists
+        pass
     
     # Create alerts table
     cursor.execute('''
