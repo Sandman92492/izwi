@@ -180,12 +180,19 @@ def dashboard():
     from models import User
     user_data = db.session.get(User, current_user.id)
     
+    # Debug logging
+    app.logger.info(f"Dashboard accessed by user {current_user.id}")
+    app.logger.info(f"User data from DB: {user_data.community_id if user_data else None}")
+    app.logger.info(f"Current user community_id: {getattr(current_user, 'community_id', None)}")
+    
     if user_data and user_data.community_id:
         # Update current user object with fresh data from database
         current_user.community_id = user_data.community_id
         current_user.role = user_data.role
+        app.logger.info(f"Updated current user community_id to: {current_user.community_id}")
     
     if not current_user.community_id:
+        app.logger.info("No community_id found, redirecting to define_community")
         return redirect(url_for('define_community'))
     
     # Get community alerts

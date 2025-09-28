@@ -42,17 +42,23 @@ def create_community(community_name, boundary_data='', business_id=None):
     db.session.add(community)
     db.session.flush()  # Get the ID
     
+    from flask import current_app
+    current_app.logger.info(f"Community created with ID: {community.id}")
+    
     # Update user with community_id and admin role
     user = db.session.get(User, current_user.id)
     if user:
         user.community_id = community.id
         user.role = 'Admin'
+        current_app.logger.info(f"Updated user {user.id} with community_id: {community.id}")
         
         # Also update the current_user object immediately
         current_user.community_id = community.id
         current_user.role = 'Admin'
+        current_app.logger.info(f"Updated current_user object community_id: {current_user.community_id}")
     
     db.session.commit()
+    current_app.logger.info(f"Database committed, returning community ID: {community.id}")
     
     return community.id, None
 
@@ -62,34 +68,21 @@ def get_community_by_invite_slug(invite_slug):
     if community:
         return (community.id, community.name)
     return None
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM communities WHERE invite_link_slug = ?', (invite_slug,))
-    community = cursor.fetchone()
-    return community
 
 def get_community_info(community_id):
     """Get community information"""
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM communities WHERE id = ?', (community_id,))
-    community = cursor.fetchone()
+    community = Community.query.get(community_id)
     return community
 
 def get_community_members(community_id):
     """Get all members of a community"""
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM users WHERE community_id = ?', (community_id,))
-    members = cursor.fetchall()
+    members = User.query.filter_by(community_id=community_id).all()
     return members
 
 def get_community_boundary_data(community_id):
     """Get community boundary data"""
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT boundary_data FROM communities WHERE id = ?', (community_id,))
-    result = cursor.fetchone()
-    return result[0] if result and result[0] else None
+    community = Community.query.get(community_id)
+    return community.boundary_data if community else None
 
 def remove_member(member_id, admin_user):
     """Remove a member from the community (admin only)"""
