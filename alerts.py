@@ -90,22 +90,30 @@ def resolve_alert(alert_id, user):
     if user.role != 'Admin':
         return False, 'Admin access required'
     
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('UPDATE alerts SET is_resolved = 1 WHERE id = ?', (alert_id,))
-    db.commit()
-    
-    return True, 'Alert marked as resolved'
+    alert = Alert.query.get(alert_id)
+    if alert:
+        alert.is_resolved = True
+        db.session.commit()
+        return True, 'Alert marked as resolved'
+    else:
+        return False, 'Alert not found'
 
 def get_alert_by_id(alert_id):
     """Get a specific alert by ID"""
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('''
-        SELECT a.*, u.name as author_name
-        FROM alerts a
-        JOIN users u ON a.user_id = u.id
-        WHERE a.id = ?
-    ''', (alert_id,))
-    alert = cursor.fetchone()
-    return alert
+    alert = Alert.query.get(alert_id)
+    if alert:
+        user = User.query.get(alert.user_id)
+        alert_dict = {
+            'id': alert.id,
+            'community_id': alert.community_id,
+            'user_id': alert.user_id,
+            'category': alert.category,
+            'description': alert.description,
+            'latitude': alert.latitude,
+            'longitude': alert.longitude,
+            'timestamp': alert.timestamp,
+            'is_resolved': alert.is_resolved,
+            'author_name': user.name if user else 'Unknown'
+        }
+        return alert_dict
+    return None
