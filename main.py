@@ -3,6 +3,7 @@ import sqlite3
 import secrets
 import string
 import re
+import json
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -528,6 +529,72 @@ def report_alert():
     except Exception as e:
         app.logger.error(f'Error processing alert report: {e}')
         return jsonify({'success': False, 'message': 'An error occurred while submitting the report'}), 500
+
+@app.route('/update-community-name', methods=['POST'])
+@login_required
+def update_community_name():
+    """Update community name (admin only)"""
+    if current_user.role != 'Admin':
+        return jsonify({'success': False, 'message': 'Admin access required'}), 403
+    
+    try:
+        data = request.get_json()
+        new_name = sanitize_plain_text(data.get('name', '').strip())
+        
+        if not new_name:
+            return jsonify({'success': False, 'message': 'Community name is required'}), 400
+        
+        if len(new_name) > 100:
+            return jsonify({'success': False, 'message': 'Community name must be less than 100 characters'}), 400
+        
+        # Check if name already exists (excluding current community)
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT id FROM communities WHERE name = ? AND id != ?', (new_name, current_user.community_id))
+        if cursor.fetchone():
+            return jsonify({'success': False, 'message': 'A community with this name already exists'}), 400
+        
+        # Update community name
+        cursor.execute('UPDATE communities SET name = ? WHERE id = ?', (new_name, current_user.community_id))
+        db.commit()
+        
+        app.logger.info(f'Community {current_user.community_id} name updated to "{new_name}" by admin {current_user.id}')
+        return jsonify({'success': True, 'message': 'Community name updated successfully'})
+    
+    except Exception as e:
+        app.logger.error(f'Error updating community name: {e}')
+        return jsonify({'success': False, 'message': 'An error occurred while updating the community name'}), 500
+
+@app.route('/update-community-boundary', methods=['POST'])
+@login_required
+def update_community_boundary():
+    """Update community boundary (admin only)"""
+    if current_user.role != 'Admin':
+        return jsonify({'success': False, 'message': 'Admin access required'}), 403
+    
+    try:
+        data = request.get_json()
+        boundary_data = data.get('boundary_data', '')
+        
+        # Validate JSON if provided
+        if boundary_data:
+            try:
+                json.loads(boundary_data)  # Validate JSON format
+            except json.JSONDecodeError:
+                return jsonify({'success': False, 'message': 'Invalid boundary data format'}), 400
+        
+        # Update community boundary
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('UPDATE communities SET boundary_data = ? WHERE id = ?', (boundary_data, current_user.community_id))
+        db.commit()
+        
+        app.logger.info(f'Community {current_user.community_id} boundary updated by admin {current_user.id}')
+        return jsonify({'success': True, 'message': 'Community boundary updated successfully'})
+    
+    except Exception as e:
+        app.logger.error(f'Error updating community boundary: {e}')
+        return jsonify({'success': False, 'message': 'An error occurred while updating the community boundary'}), 500
 
 # Custom error handlers to hide technical details from users
 @app.errorhandler(404)
