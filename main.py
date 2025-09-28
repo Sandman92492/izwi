@@ -254,7 +254,16 @@ def dashboard():
     
     alerts = cursor.fetchall()
     
+    # Get community boundary data
+    cursor.execute('''
+        SELECT boundary_data FROM communities WHERE id = ?
+    ''', (current_user.community_id,))
+    
+    community_result = cursor.fetchone()
+    boundary_data = community_result[0] if community_result and community_result[0] else None
+    
     return render_template('dashboard.html', alerts=alerts, 
+                         boundary_data=boundary_data,
                          get_category_color=get_category_color, 
                          get_category_icon=get_category_icon,
                          format_time_ago=format_time_ago)
