@@ -168,12 +168,15 @@ Remove
 <!-- Boundary Editing Modal -->
 <div id="boundaryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
 <div class="bg-white dark:bg-background-dark rounded-lg max-w-4xl w-full h-[80vh] overflow-hidden flex flex-col">
-<div class="p-4 border-b border-border-light dark:border-border-dark flex items-center justify-between">
+<!-- Fixed Header -->
+<div class="p-4 border-b border-border-light dark:border-border-dark flex items-center justify-between flex-shrink-0">
 <h3 class="font-body font-semibold text-lg">Edit Community Boundary</h3>
 <button onclick="closeBoundaryModal()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
 <span class="material-symbols-outlined">close</span>
 </button>
 </div>
+<!-- Scrollable Content Area -->
+<div class="flex-1 overflow-y-auto">
 <div class="p-4">
 <div class="mb-4 space-y-3">
 <div class="flex gap-2">
@@ -194,8 +197,12 @@ Community Center
 </button>
 </div>
 </div>
-<div id="boundaryMap" style="height: 250px; width: 100%;"></div>
-<div class="mt-4 text-sm text-subtext-light dark:text-subtext-dark">
+</div>
+
+<div id="boundaryMap" style="height: 200px; width: 100%;"></div>
+
+<div class="p-4">
+<div class="text-sm text-subtext-light dark:text-subtext-dark">
 <p class="mb-2">Use the drawing tools to define your community boundary:</p>
 <ul class="list-disc list-inside space-y-1">
 <li>Click the polygon tool to draw a custom shape</li>
@@ -203,14 +210,17 @@ Community Center
 <li>Click the rectangle tool to draw a rectangular boundary</li>
 </ul>
 </div>
-<div class="mt-4 flex gap-3 justify-end">
+</div>
+</div>
+
+<!-- Fixed Footer -->
+<div class="p-4 border-t border-border-light dark:border-border-dark flex gap-3 justify-end flex-shrink-0 bg-white dark:bg-background-dark">
 <button onclick="closeBoundaryModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium">
 Cancel
 </button>
 <button onclick="saveBoundary()" class="px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 font-medium">
 Save Boundary
 </button>
-</div>
 </div>
 </div>
 </div>
