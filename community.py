@@ -54,7 +54,10 @@ def create_community(community_name, boundary_data='', business_id=None):
 
 def get_community_by_invite_slug(invite_slug):
     """Get community by invite slug"""
-    db = get_db()
+    community = Community.query.filter_by(invite_link_slug=invite_slug).first()
+    if community:
+        return (community.id, community.name)
+    return None
     cursor = db.cursor()
     cursor.execute('SELECT * FROM communities WHERE invite_link_slug = ?', (invite_slug,))
     community = cursor.fetchone()
