@@ -24,8 +24,8 @@ app.config['REMEMBER_COOKIE_REFRESH_EACH_REQUEST'] = False
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-login_manager.remember_cookie_duration = timedelta(days=30)  # Remember for 30 days
-login_manager.session_protection = None  # Disable for remember me to work properly
+login_manager.login_message = "Please log in to access this page."
+login_manager.login_message_category = "info"
 
 class User(UserMixin):
     def __init__(self, id, email, name, avatar_url, community_id, role):
