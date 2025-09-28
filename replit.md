@@ -13,14 +13,17 @@ A Flask-based community alert system that allows users to create and join commun
 - **2025-09-26**: Dashboard map with real-time alert markers and category icons
 - **2025-09-26**: Post alert location selection with click-to-set and geolocation
 - **2025-09-26**: Community boundary drawing with Leaflet Draw tools
+- **2025-09-26**: Separated home screen from sign-up page for better user experience
+- **2025-09-26**: Added clear sign-in option for existing users on home and sign-up pages
 
 ## Project Architecture
 ### Backend Structure
 - `main.py`: Flask application with all routes and authentication logic
 - `database.py`: SQLite database initialization and schema management
 - `templates/`: Jinja2 templates converted from original HTML designs
-  - `login.html`: User login page
-  - `landing.html`: Landing/signup page with community invitation support
+  - `home.html`: Main landing page with sign-in and sign-up options
+  - `login.html`: User login page with link back to sign-up
+  - `landing.html`: Community sign-up page with community invitation support
   - `dashboard.html`: Main dashboard with alert feed and map view
   - `settings.html`: Community management and member administration
   - `define_community.html`: Community creation interface
