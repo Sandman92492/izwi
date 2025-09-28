@@ -18,6 +18,10 @@ A Flask-based community alert system that allows users to create and join commun
 - **2025-09-28**: Color-coded alert system with simplified card design and emoji icons
 - **2025-09-28**: Enhanced map markers with larger, more visible category-specific pins
 - **2025-09-28**: Community boundary display on dashboard map with persistent storage
+- **2025-09-28**: Added comprehensive legal documents for POPIA compliance
+- **2025-09-28**: Created Privacy Policy emphasizing South African data storage and user rights
+- **2025-09-28**: Created Terms of Service with emergency service disclaimers and user responsibilities
+- **2025-09-28**: Added footer links to legal documents across all main application templates
 
 ## Project Architecture
 ### Backend Structure
