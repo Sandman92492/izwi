@@ -498,6 +498,29 @@ def join_community(slug):
         flash('Invalid invite link')
         return redirect(url_for('index'))
 
+@app.route('/report-alert', methods=['POST'])
+@login_required
+def report_alert():
+    """Handle alert reporting"""
+    try:
+        data = request.get_json()
+        alert_id = data.get('alert_id')
+        
+        if not alert_id:
+            return jsonify({'success': False, 'message': 'Alert ID is required'}), 400
+        
+        # Log the report action
+        app.logger.info(f'Alert {alert_id} reported by user {current_user.id} ({current_user.email}) at {datetime.utcnow()}')
+        
+        # In a production system, you would save this to a reports table
+        # For now, we're just logging as requested
+        
+        return jsonify({'success': True, 'message': 'Report submitted successfully'})
+    
+    except Exception as e:
+        app.logger.error(f'Error processing alert report: {e}')
+        return jsonify({'success': False, 'message': 'An error occurred while submitting the report'}), 500
+
 # Custom error handlers to hide technical details from users
 @app.errorhandler(404)
 def not_found_error(error):
