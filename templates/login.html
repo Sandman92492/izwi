@@ -52,14 +52,20 @@
 <div class="text-center mb-8">
 <h1 class="text-4xl font-bold text-text-primary dark:text-background-light">iZwi</h1>
 </div>
-<form method="POST" class="space-y-6">
+<form method="POST" class="space-y-6" autocomplete="on">
 <div>
 <label class="sr-only" for="email">Email</label>
-<input class="w-full h-14 px-4 bg-input-light dark:bg-input-dark text-text-primary dark:text-background-light placeholder-placeholder-light dark:placeholder-placeholder-dark border-0 rounded-lg focus:ring-2 focus:ring-primary focus:ring-opacity-50" id="email" name="email" placeholder="Email" type="email" required/>
+<input class="w-full h-14 px-4 bg-input-light dark:bg-input-dark text-text-primary dark:text-background-light placeholder-placeholder-light dark:placeholder-placeholder-dark border-0 rounded-lg focus:ring-2 focus:ring-primary focus:ring-opacity-50" id="email" name="email" placeholder="Email" type="email" autocomplete="email" required/>
 </div>
 <div>
 <label class="sr-only" for="password">Password</label>
-<input class="w-full h-14 px-4 bg-input-light dark:bg-input-dark text-text-primary dark:text-background-light placeholder-placeholder-light dark:placeholder-placeholder-dark border-0 rounded-lg focus:ring-2 focus:ring-primary focus:ring-opacity-50" id="password" name="password" placeholder="Password" type="password" required/>
+<input class="w-full h-14 px-4 bg-input-light dark:bg-input-dark text-text-primary dark:text-background-light placeholder-placeholder-light dark:placeholder-placeholder-dark border-0 rounded-lg focus:ring-2 focus:ring-primary focus:ring-opacity-50" id="password" name="password" placeholder="Password" type="password" autocomplete="current-password" required/>
+</div>
+<div class="flex items-center">
+<input id="remember-me" name="remember" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+<label for="remember-me" class="ml-2 block text-sm text-placeholder-light dark:text-placeholder-dark">
+Remember me for 30 days
+</label>
 </div>
 <div class="mt-8">
 <button type="submit" class="w-full h-14 bg-primary text-white font-bold rounded-lg hover:bg-opacity-90 transition-colors duration-300">

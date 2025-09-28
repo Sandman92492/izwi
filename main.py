@@ -79,7 +79,10 @@ def login():
         
         if user_data and check_password_hash(user_data[2], password):
             user = User(user_data[0], user_data[1], user_data[3], user_data[4], user_data[5], user_data[6])
-            login_user(user)
+            
+            # Handle "Remember me" functionality
+            remember = request.form.get('remember') == 'on'
+            login_user(user, remember=remember)
             
             # Redirect based on whether user has a community
             if user.community_id:
