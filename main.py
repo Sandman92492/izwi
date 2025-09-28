@@ -2,7 +2,7 @@ import os
 import sqlite3
 import secrets
 import string
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,10 +13,18 @@ app.secret_key = os.environ.get('SESSION_SECRET')
 if not app.secret_key:
     raise ValueError("SESSION_SECRET environment variable is required")
 
+# Configure session for remember me functionality
+app.permanent_session_lifetime = timedelta(days=30)
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
+app.config['REMEMBER_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+app.config['REMEMBER_COOKIE_HTTPONLY'] = True
+
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+login_manager.remember_cookie_duration = timedelta(days=30)  # Remember for 30 days
+login_manager.session_protection = 'strong'
 
 class User(UserMixin):
     def __init__(self, id, email, name, avatar_url, community_id, role):
