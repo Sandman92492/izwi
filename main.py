@@ -2,10 +2,13 @@ import os
 import sqlite3
 import secrets
 import string
+import re
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import bleach
+from markupsafe import Markup
 from database import init_db, get_db
 
 app = Flask(__name__)
@@ -45,6 +48,43 @@ def load_user(user_id):
     if user_data:
         return User(user_data[0], user_data[1], user_data[3], user_data[4], user_data[5], user_data[6])
     return None
+
+def sanitize_text_input(text):
+    """Sanitize user text input to prevent XSS attacks"""
+    if not text:
+        return text
+    # Allow basic formatting but strip dangerous tags and attributes
+    allowed_tags = ['p', 'br', 'strong', 'em', 'u']
+    allowed_attributes = {}
+    return bleach.clean(text, tags=allowed_tags, attributes=allowed_attributes, strip=True)
+
+def sanitize_plain_text(text):
+    """Sanitize plain text input, removing all HTML tags"""
+    if not text:
+        return text
+    return bleach.clean(text, tags=[], attributes={}, strip=True)
+
+def validate_email(email):
+    """Validate email format"""
+    if not email:
+        return False
+    # Basic email validation pattern
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+def validate_json_data(data):
+    """Validate and sanitize JSON data"""
+    if not data:
+        return ""
+    try:
+        import json
+        # Try to parse as JSON to validate format
+        parsed = json.loads(data)
+        # Re-serialize to ensure clean format
+        return json.dumps(parsed)
+    except (json.JSONDecodeError, ValueError):
+        # If not valid JSON, treat as plain text and sanitize
+        return sanitize_plain_text(data)
 
 def generate_invite_slug():
     """Generate a unique invite slug for communities"""
@@ -123,8 +163,17 @@ def signup_page():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = sanitize_plain_text(request.form.get('email', '').strip())
+        password = request.form.get('password', '')
+        
+        # Validate input
+        if not email or not password:
+            flash('Email and password are required')
+            return render_template('login.html')
+        
+        if not validate_email(email):
+            flash('Please enter a valid email address')
+            return render_template('login.html')
         
         db = get_db()
         cursor = db.cursor()
@@ -154,8 +203,21 @@ def login():
 
 @app.route('/signup', methods=['POST'])
 def signup_submit():
-        email = request.form['email']
-        password = request.form['password']
+        email = sanitize_plain_text(request.form.get('email', '').strip())
+        password = request.form.get('password', '')
+        
+        # Validate input
+        if not email or not password:
+            flash('Email and password are required')
+            return redirect(url_for('signup_page'))
+        
+        if not validate_email(email):
+            flash('Please enter a valid email address')
+            return redirect(url_for('signup_page'))
+        
+        if len(password) < 8:
+            flash('Password must be at least 8 characters long')
+            return redirect(url_for('signup_page'))
         
         # Check if user already exists
         db = get_db()
@@ -200,8 +262,17 @@ def logout():
 @login_required
 def define_community():
     if request.method == 'POST':
-        community_name = request.form['community_name']
-        boundary_data = request.form.get('boundary_data', '')
+        community_name = sanitize_plain_text(request.form.get('community_name', '').strip())
+        boundary_data = validate_json_data(request.form.get('boundary_data', ''))
+        
+        # Validate input
+        if not community_name:
+            flash('Community name is required')
+            return render_template('define_community.html')
+        
+        if len(community_name) > 100:
+            flash('Community name must be less than 100 characters')
+            return render_template('define_community.html')
         
         # Create new community
         db = get_db()
@@ -232,8 +303,6 @@ def define_community():
         session.permanent = True
         
         # Boundary data is now stored in the database
-        if boundary_data:
-            print(f"Community boundary data saved for {community_name}")
         
         return redirect(url_for('dashboard'))
     
@@ -290,10 +359,25 @@ def post_alert():
         return redirect(url_for('define_community'))
     
     if request.method == 'POST':
-        category = request.form['category']
-        description = request.form['description']
-        latitude = float(request.form.get('latitude', 0)) if request.form.get('latitude') else 0
-        longitude = float(request.form.get('longitude', 0)) if request.form.get('longitude') else 0
+        category = sanitize_plain_text(request.form.get('category', ''))
+        description = sanitize_text_input(request.form.get('description', ''))
+        
+        # Validate input
+        if not category or not description:
+            flash('Category and description are required')
+            return render_template('post_alert.html')
+        
+        if len(description) > 500:
+            flash('Description must be less than 500 characters')
+            return render_template('post_alert.html')
+        
+        # Validate and parse coordinates
+        try:
+            latitude = float(request.form.get('latitude', 0)) if request.form.get('latitude') else 0
+            longitude = float(request.form.get('longitude', 0)) if request.form.get('longitude') else 0
+        except (ValueError, TypeError):
+            latitude = 0
+            longitude = 0
         
         db = get_db()
         cursor = db.cursor()
