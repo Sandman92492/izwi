@@ -133,8 +133,13 @@ def check_community_limits(community, action_type):
     if not community:
         return False, "Community not found"
     
-    # Get subscription limits
-    subscription_plan = getattr(community, 'subscription_plan', 'Free')
+    # Get subscription limits - properly handle sqlite3.Row object
+    try:
+        subscription_plan = community['subscription_plan'] if 'subscription_plan' in community.keys() else 'Free'
+    except (TypeError, AttributeError):
+        # Fallback for older community data structures
+        subscription_plan = community[4] if len(community) > 4 else 'Free'
+    
     limits = get_subscription_limits(subscription_plan)
     
     db = get_db()
