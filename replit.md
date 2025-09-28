@@ -89,4 +89,4 @@ A Flask-based community alert system that allows users to create and join commun
 - Debug mode enabled for development
 
 ## Current Status
-Flask server running successfully on port 5000 with all core functionality implemented.
+Project imported to Replit - setting up for Replit environment with proper database configuration and hosting setup.
