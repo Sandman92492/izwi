@@ -43,7 +43,28 @@ def generate_invite_slug():
 
 @app.route('/')
 def index():
-    return render_template('landing.html')
+    return render_template('home.html')
+
+@app.route('/signup')
+def signup_page():
+    # Check for invite link
+    invite_slug = request.args.get('invite')
+    invite = None
+    
+    if invite_slug:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT * FROM communities WHERE invite_link_slug = ?', (invite_slug,))
+        community = cursor.fetchone()
+        
+        if community:
+            session['invite_community_id'] = community[0]
+            invite = {
+                'community_name': community[1],
+                'slug': invite_slug
+            }
+    
+    return render_template('landing.html', invite=invite)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -70,9 +91,8 @@ def login():
     
     return render_template('login.html')
 
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
+@app.route('/signup', methods=['POST'])
+def signup_submit():
         email = request.form['email']
         password = request.form['password']
         
@@ -82,7 +102,7 @@ def signup():
         cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
         if cursor.fetchone():
             flash('Email already registered')
-            return redirect(url_for('signup'))
+            return redirect(url_for('signup_page'))
         
         # Create new user
         password_hash = generate_password_hash(password)
@@ -108,8 +128,6 @@ def signup():
             return redirect(url_for('dashboard'))
         else:
             return redirect(url_for('define_community'))
-    
-    return render_template('landing.html')
 
 @app.route('/logout')
 @login_required

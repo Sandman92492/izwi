@@ -45,31 +45,29 @@
 <div class="px-4 py-12 md:py-20">
 <div class="container mx-auto max-w-4xl">
 <div class="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-<div class="w-full lg:w-1/2">
-<div class="relative w-full aspect-video rounded-lg shadow-lg overflow-hidden">
-<img alt="Map showing community boundary" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWMrzf8SPsBugB2OA-B7dAl8bgfh5onqxQGBuLgPSZunCcJhUKZspbmJ8YfMxkw4UzaX6H4c2AhsVYvkRs47JbdL84-3FfbndmMeLa6rIZJpugz-6MfP_kxKOA0VmxxiCVofQbIS5JNq7bMpd_j-ZyfYilEyuz87lwQBLc9d4u2avPv--lLWKj-PYGEGJXHxaTOotmFpAMOCQuUoULSUnhw8FZ0Ija_ppr0xrSXwaAvVLHi_7kVxcKNcMytJi3k7h1nYri5x3VHfc"/>
+<div class="w-full lg:w-1/2 flex justify-center lg:order-last">
+<div class="relative w-72 h-auto">
+<div class="absolute -top-4 -left-4 w-full h-full bg-primary/20 rounded-xl transform -rotate-6"></div>
+<div class="relative z-10 w-full h-auto bg-background-light dark:bg-background-dark p-2 rounded-xl shadow-lg">
+<img alt="iZwi App on a phone" class="rounded-lg w-full h-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLCpOuHDpbH3PtRtV17ONkC7ZAq9LIgW3kKxGvhPW6GgWOX6yGifC3ZKpb4cdEROc16Q7wX3z-v0ypVWpeXz1V6YE3zrTPkq8-hug7jF461oNEGVM-vsV6a3_s2bEIDvJC66ju5gyhFpe7tNYPTw4JXm537IwEoy0yXCieow0s_f69CfnRX0jZEwI4alGnqMD_45i8BQABW_ghaKPeAGhO3NFZYaMSOIPnnbTfScF5MREoFNFQBM9ofInU8jjEKSCLbIMqzBLOgSM"/>
+</div>
 </div>
 </div>
 <div class="w-full lg:w-1/2 text-center lg:text-left">
-<h1 class="font-display font-semibold text-3xl md:text-4xl text-primary-text dark:text-white leading-tight">
-                            {% if invite %}You're invited to join a community!{% else %}Create Your Community{% endif %}
+<h1 class="font-display font-semibold text-5xl md:text-6xl text-primary-text dark:text-white leading-tight">
+                            iZwi
                         </h1>
-<form method="POST" action="{{ url_for('signup_submit') }}" class="mt-8 space-y-4">
-<div>
-<label class="sr-only" for="email">Email address</label>
-<input class="w-full px-4 py-3 bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-primary focus:border-primary text-primary-text dark:text-white placeholder-secondary-text" id="email" name="email" placeholder="Enter your email address" type="email" required/>
-</div>
-<div>
-<label class="sr-only" for="password">Password</label>
-<input class="w-full px-4 py-3 bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-primary focus:border-primary text-primary-text dark:text-white placeholder-secondary-text" id="password" name="password" placeholder="Create a password" type="password" required/>
-</div>
-<button class="w-full inline-flex items-center justify-center px-8 py-3 bg-primary text-white font-display font-medium rounded-lg text-lg hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/30 transition-all duration-300" type="submit">
-                                {% if invite %}Join Community{% else %}Create a Free Community{% endif %}
-                            </button>
-</form>
-<div class="mt-4 text-center">
+<p class="mt-4 text-lg md:text-xl text-secondary-text dark:text-gray-300">
+                            Stay informed and connected with your community. Receive real-time alerts and updates on local events, safety concerns, and more.
+                        </p>
+<div class="mt-8 space-y-4">
+<a href="{{ url_for('signup_page') }}" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3 bg-primary text-white font-display font-medium rounded-lg text-lg hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/30 transition-all duration-300">
+                                Create a Free Community
+                            </a>
+<div class="text-center">
 <span class="text-secondary-text dark:text-gray-400">Already have an account?</span>
 <a href="{{ url_for('login') }}" class="text-primary hover:text-primary/80 font-medium ml-1">Sign In</a>
+</div>
 </div>
 </div>
 </div>
