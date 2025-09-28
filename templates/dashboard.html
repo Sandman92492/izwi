@@ -197,19 +197,19 @@ Report
 [
     {% for alert in alerts %}
     {
-        "id": {{ alert[0] }},
-        "category": "{{ alert[3] }}",
-        "description": "{{ alert[4] }}",
-        "lat": {{ alert[5] if alert[5] else -26.2041 }},
-        "lng": {{ alert[6] if alert[6] else 28.0473 }},
-        "timestamp": "{{ alert[7] }}"
+        "id": {{ alert.id if alert.id is not none else 0 }},
+        "category": "{{ alert.category if alert.category else 'Other' }}",
+        "description": "{{ (alert.description if alert.description else 'No description')|e }}",
+        "lat": {{ alert.latitude if alert.latitude is not none else -26.2041 }},
+        "lng": {{ alert.longitude if alert.longitude is not none else 26.889513 }},
+        "timestamp": "{{ alert.timestamp if alert.timestamp else 'Unknown time' }}"
     }{% if not loop.last %},{% endif %}
     {% endfor %}
 ]
 </script>
 
 <script type="application/json" id="boundary-data">
-{% if boundary_data %}"{{ boundary_data }}"{% else %}null{% endif %}
+{% if boundary_data %}"{{ boundary_data|e }}"{% else %}null{% endif %}
 </script>
 
 <!-- Load dashboard JavaScript -->

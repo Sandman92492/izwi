@@ -69,6 +69,11 @@ def login():
             if remember:
                 session.permanent = True
             
+            # Debug logging for session
+            app.logger.info(f'User {user.id} logged in successfully')
+            app.logger.info(f'Session ID: {session.get("_id", "No session ID")}')
+            app.logger.info(f'User community_id: {user.community_id}')
+            
             # Add success message for login
             flash('Welcome back! You have been successfully logged in.', 'success')
             
