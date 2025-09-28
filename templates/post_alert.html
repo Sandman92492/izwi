@@ -51,6 +51,7 @@
 
 <main class="flex-1 overflow-y-auto">
 <form method="POST" action="{{ url_for('post_alert') }}" class="p-4 space-y-6 max-w-md mx-auto">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 <div>
 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Category</h2>
 <input type="hidden" name="category" id="selected_category" required>

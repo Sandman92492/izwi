@@ -53,6 +53,7 @@
 <h1 class="text-4xl font-bold text-text-primary dark:text-background-light">iZwi</h1>
 </div>
 <form method="POST" class="space-y-6" autocomplete="on">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 <div>
 <label class="sr-only" for="email">Email</label>
 <input class="w-full h-14 px-4 bg-input-light dark:bg-input-dark text-text-primary dark:text-background-light placeholder-placeholder-light dark:placeholder-placeholder-dark border-0 rounded-lg focus:ring-2 focus:ring-primary focus:ring-opacity-50" id="email" name="email" placeholder="Email" type="email" autocomplete="email" required/>

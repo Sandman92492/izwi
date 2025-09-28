@@ -6,6 +6,7 @@ import re
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
 import bleach
 from markupsafe import Markup
@@ -16,12 +17,23 @@ app.secret_key = os.environ.get('SESSION_SECRET')
 if not app.secret_key:
     raise ValueError("SESSION_SECRET environment variable is required")
 
+# Enhanced security configuration
+is_production = os.environ.get('FLASK_ENV') == 'production'
+app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # CSRF token expires in 1 hour
+app.config['WTF_CSRF_SSL_STRICT'] = is_production
+app.config['SESSION_COOKIE_SECURE'] = is_production
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)  # Sessions expire after 24 hours
+
 # Configure session for remember me functionality
-app.permanent_session_lifetime = timedelta(days=30)
-app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
-app.config['REMEMBER_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
+remember_duration = timedelta(days=7) if is_production else timedelta(days=3)  # Shorter in production
+app.permanent_session_lifetime = timedelta(hours=24)
+app.config['REMEMBER_COOKIE_DURATION'] = remember_duration
+app.config['REMEMBER_COOKIE_SECURE'] = is_production
 app.config['REMEMBER_COOKIE_HTTPONLY'] = True
 app.config['REMEMBER_COOKIE_REFRESH_EACH_REQUEST'] = False
+app.config['REMEMBER_COOKIE_SAMESITE'] = 'Lax'
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -29,6 +41,23 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message = "Please log in to access this page."
 login_manager.login_message_category = "info"
+
+# Initialize CSRF protection
+csrf = CSRFProtect(app)
+
+@app.before_request
+def check_session_activity():
+    """Check session timeout before each request to authenticated routes"""
+    # Skip session timeout for certain routes that don't need authentication
+    if request.endpoint in ['index', 'signup_page', 'login', 'join_community', 'static']:
+        return
+    
+    # Check session timeout for authenticated users
+    if current_user.is_authenticated:
+        if check_session_timeout():
+            logout_user()
+            flash('Your session has expired. Please log in again.')
+            return redirect(url_for('login'))
 
 class User(UserMixin):
     def __init__(self, id, email, name, avatar_url, community_id, role):
@@ -85,6 +114,21 @@ def validate_json_data(data):
     except (json.JSONDecodeError, ValueError):
         # If not valid JSON, treat as plain text and sanitize
         return sanitize_plain_text(data)
+
+def check_session_timeout():
+    """Check if the current session has timed out"""
+    try:
+        if 'last_activity' in session:
+            last_activity = datetime.fromisoformat(session['last_activity'])
+            if datetime.now() - last_activity > timedelta(hours=24):
+                session.clear()
+                return True
+        session['last_activity'] = datetime.now().isoformat()
+        return False
+    except (ValueError, TypeError):
+        # Handle malformed timestamp data
+        session.clear()
+        return True
 
 def generate_invite_slug():
     """Generate a unique invite slug for communities"""
@@ -185,7 +229,7 @@ def login():
             
             # Handle "Remember me" functionality
             remember = request.form.get('remember') == 'on'
-            login_user(user, remember=remember, duration=timedelta(days=30) if remember else None)
+            login_user(user, remember=remember, duration=remember_duration if remember else None)
             
             # Make session permanent if remember me is checked
             if remember:
@@ -440,6 +484,43 @@ def join_community(slug):
     else:
         flash('Invalid invite link')
         return redirect(url_for('index'))
+
+# Custom error handlers to hide technical details from users
+@app.errorhandler(404)
+def not_found_error(error):
+    """Handle 404 Not Found errors"""
+    return render_template('errors/404.html'), 404
+
+@app.errorhandler(403)
+def forbidden_error(error):
+    """Handle 403 Forbidden errors"""
+    return render_template('errors/403.html'), 403
+
+@app.errorhandler(500)
+def internal_error(error):
+    """Handle 500 Internal Server errors"""
+    # Log the error for debugging but don't show it to the user
+    app.logger.error(f'Server Error: {error}')
+    return render_template('errors/500.html'), 500
+
+@app.errorhandler(429)
+def too_many_requests_error(error):
+    """Handle 429 Too Many Requests errors"""
+    return render_template('errors/429.html'), 429
+
+@app.errorhandler(400)
+def bad_request_error(error):
+    """Handle 400 Bad Request errors"""
+    return render_template('errors/400.html'), 400
+
+# Global exception handler for any unhandled exceptions
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Handle any unhandled exceptions"""
+    # Log the error for debugging
+    app.logger.error(f'Unhandled Exception: {e}', exc_info=True)
+    # Return generic error page without technical details
+    return render_template('errors/500.html'), 500
 
 if __name__ == '__main__':
     init_db()

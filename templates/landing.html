@@ -55,6 +55,7 @@
                             {% if invite %}You're invited to join a community!{% else %}Create Your Community{% endif %}
                         </h1>
 <form method="POST" action="{{ url_for('signup_submit') }}" class="mt-8 space-y-4" autocomplete="on">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 <div>
 <label class="sr-only" for="email">Email address</label>
 <input class="w-full px-4 py-3 bg-white dark:bg-background-dark border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-primary focus:border-primary text-primary-text dark:text-white placeholder-secondary-text" id="email" name="email" placeholder="Enter your email address" type="email" autocomplete="email" required/>
