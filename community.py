@@ -4,7 +4,7 @@ from flask_login import current_user
 from database import get_db
 from utils import sanitize_plain_text, validate_json_data, generate_invite_slug
 
-def create_community(community_name, boundary_data=''):
+def create_community(community_name, boundary_data='', business_id=None):
     """Create a new community"""
     # Validate input
     if not community_name:
@@ -29,11 +29,14 @@ def create_community(community_name, boundary_data=''):
     # Generate unique invite slug
     invite_slug = generate_invite_slug()
     
+    # Determine subscription plan based on business association
+    subscription_plan = 'Premium' if business_id else 'Free'
+    
     # Create community
     cursor.execute('''
-        INSERT INTO communities (name, admin_user_id, invite_link_slug, subscription_plan, boundary_data)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (community_name, current_user.id, invite_slug, 'Free', boundary_data))
+        INSERT INTO communities (name, admin_user_id, invite_link_slug, subscription_plan, boundary_data, business_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (community_name, current_user.id, invite_slug, subscription_plan, boundary_data, business_id))
     
     community_id = cursor.lastrowid
     
@@ -81,7 +84,7 @@ def get_community_boundary_data(community_id):
 
 def remove_member(member_id, admin_user):
     """Remove a member from the community (admin only)"""
-    if admin_user.role != 'Admin':
+    if not (admin_user.role in ['Admin', 'Business'] or admin_user.is_business_user()):
         return False, 'You do not have permission to remove members'
     
     db = get_db()
@@ -92,8 +95,8 @@ def remove_member(member_id, admin_user):
     return True, 'Member removed successfully'
 
 def update_community_name(new_name, community_id, admin_user):
-    """Update community name (admin only)"""
-    if admin_user.role != 'Admin':
+    """Update community name (admin or business user only)"""
+    if not (admin_user.role in ['Admin', 'Business'] or admin_user.is_business_user()):
         return False, 'Admin access required'
     
     # Sanitize and validate input
@@ -119,8 +122,8 @@ def update_community_name(new_name, community_id, admin_user):
     return True, 'Community name updated successfully!'
 
 def update_community_boundary(boundary_data, community_id, admin_user):
-    """Update community boundary (admin only)"""
-    if admin_user.role != 'Admin':
+    """Update community boundary (admin or business user only)"""
+    if not (admin_user.role in ['Admin', 'Business'] or admin_user.is_business_user()):
         return False, 'Admin access required'
     
     # Validate JSON if provided
@@ -137,3 +140,58 @@ def update_community_boundary(boundary_data, community_id, admin_user):
     db.commit()
     
     return True, 'Community boundary updated successfully!'
+
+def get_business_info(business_id):
+    """Get business information for white-labeling"""
+    if not business_id:
+        return None
+    
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM businesses WHERE id = ? AND is_active = 1', (business_id,))
+    business = cursor.fetchone()
+    return business
+
+def get_community_business_info(community_id):
+    """Get business information associated with a community"""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('''
+        SELECT b.* FROM businesses b
+        JOIN communities c ON b.id = c.business_id
+        WHERE c.id = ? AND b.is_active = 1
+    ''', (community_id,))
+    business = cursor.fetchone()
+    return business
+
+def get_business_communities(business_id):
+    """Get all communities associated with a business"""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM communities WHERE business_id = ?', (business_id,))
+    communities = cursor.fetchall()
+    return communities
+
+def create_business(name, logo_url=None, primary_color='#1F2937', contact_email=None, subscription_tier='Free'):
+    """Create a new business for white-labeling"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    # Sanitize inputs
+    name = sanitize_plain_text(name.strip())
+    if logo_url:
+        logo_url = sanitize_plain_text(logo_url.strip())
+    if contact_email:
+        contact_email = sanitize_plain_text(contact_email.strip())
+    if primary_color:
+        primary_color = sanitize_plain_text(primary_color.strip())
+    
+    cursor.execute('''
+        INSERT INTO businesses (name, logo_url, primary_color, contact_email, subscription_tier)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (name, logo_url, primary_color, contact_email, subscription_tier))
+    
+    business_id = cursor.lastrowid
+    db.commit()
+    
+    return business_id
