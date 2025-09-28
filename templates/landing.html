@@ -51,6 +51,25 @@
 </div>
 </div>
 <div class="w-full lg:w-1/2 text-center lg:text-left">
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="mb-6 space-y-3">
+      {% for category, message in messages %}
+        <div class="alert-message p-4 rounded-lg border-l-4 {% if category == 'success' %}bg-green-50 border-green-400 text-green-700 dark:bg-green-900/20 dark:border-green-500 dark:text-green-300{% elif category == 'error' %}bg-red-50 border-red-400 text-red-700 dark:bg-red-900/20 dark:border-red-500 dark:text-red-300{% else %}bg-blue-50 border-blue-400 text-blue-700 dark:bg-blue-900/20 dark:border-blue-500 dark:text-blue-300{% endif %}" role="alert">
+          <div class="flex items-center">
+            <span class="mr-2">
+              {% if category == 'success' %}✅{% elif category == 'error' %}❌{% else %}ℹ️{% endif %}
+            </span>
+            <span class="text-sm font-medium">{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
 <h1 class="font-display font-semibold text-3xl md:text-4xl text-primary-text dark:text-white leading-tight">
                             {% if invite %}You're invited to join a community!{% else %}Create Your Community{% endif %}
                         </h1>
@@ -74,8 +93,9 @@
     <a href="{{ url_for('privacy_policy') }}" class="text-primary hover:text-primary/80 underline" target="_blank">Privacy Policy</a>
 </label>
 </div>
-<button class="w-full inline-flex items-center justify-center px-8 py-3 bg-primary text-white font-display font-medium rounded-lg text-lg hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/30 transition-all duration-300" type="submit">
-                                {% if invite %}Join Community{% else %}Create a Free Community{% endif %}
+<button id="signup-btn" class="w-full inline-flex items-center justify-center px-8 py-3 bg-primary text-white font-display font-medium rounded-lg text-lg hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/30 transition-all duration-300" type="submit">
+                                <span class="btn-text">{% if invite %}Join Community{% else %}Create a Free Community{% endif %}</span>
+                                <span class="btn-loading hidden">{% if invite %}Joining...{% else %}Creating...{% endif %}</span>
                             </button>
 </form>
 <div class="mt-4 text-center">
@@ -98,5 +118,35 @@
         </div>
 </footer>
 </div>
+
+<script>
+// Add loading state functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('signup-btn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoading = submitBtn.querySelector('.btn-loading');
+    
+    form.addEventListener('submit', function() {
+        // Disable button and show loading state
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+        btnText.classList.add('hidden');
+        btnLoading.classList.remove('hidden');
+    });
+    
+    // Auto-hide flash messages after 5 seconds
+    const alertMessages = document.querySelectorAll('.alert-message');
+    alertMessages.forEach(function(message) {
+        setTimeout(function() {
+            message.style.transition = 'opacity 0.5s ease-out';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        }, 5000);
+    });
+});
+</script>
 
 </body></html>

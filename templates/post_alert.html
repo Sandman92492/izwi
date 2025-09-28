@@ -50,6 +50,25 @@
 </header>
 
 <main class="flex-1 overflow-y-auto">
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="p-4 space-y-3 max-w-md mx-auto">
+      {% for category, message in messages %}
+        <div class="alert-message p-4 rounded-lg border-l-4 {% if category == 'success' %}bg-green-50 border-green-400 text-green-700 dark:bg-green-900/20 dark:border-green-500 dark:text-green-300{% elif category == 'error' %}bg-red-50 border-red-400 text-red-700 dark:bg-red-900/20 dark:border-red-500 dark:text-red-300{% else %}bg-blue-50 border-blue-400 text-blue-700 dark:bg-blue-900/20 dark:border-blue-500 dark:text-blue-300{% endif %}" role="alert">
+          <div class="flex items-center">
+            <span class="mr-2">
+              {% if category == 'success' %}✅{% elif category == 'error' %}❌{% else %}ℹ️{% endif %}
+            </span>
+            <span class="text-sm font-medium">{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
 <form method="POST" action="{{ url_for('post_alert') }}" class="p-4 space-y-6 max-w-md mx-auto">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 <div>
@@ -100,8 +119,9 @@
 <input type="hidden" name="longitude" id="longitude">
 </div>
 
-<button type="submit" class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-opacity-90 transition-colors duration-200">
-Post Alert
+<button type="submit" id="post-alert-btn" class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-opacity-90 transition-colors duration-200">
+<span class="btn-text">Post Alert</span>
+<span class="btn-loading hidden">Posting...</span>
 </button>
 </form>
 </main>
@@ -179,6 +199,42 @@ function selectCategory(event, category) {
     document.getElementById('selected_category').value = category;
     selectedCategory = category;
 }
+
+// Add loading state functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('post-alert-btn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoading = submitBtn.querySelector('.btn-loading');
+    
+    form.addEventListener('submit', function(e) {
+        // Check if category is selected
+        const selectedCategory = document.getElementById('selected_category').value;
+        if (!selectedCategory) {
+            e.preventDefault();
+            alert('Please select a category for your alert.');
+            return;
+        }
+        
+        // Disable button and show loading state
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+        btnText.classList.add('hidden');
+        btnLoading.classList.remove('hidden');
+    });
+    
+    // Auto-hide flash messages after 5 seconds
+    const alertMessages = document.querySelectorAll('.alert-message');
+    alertMessages.forEach(function(message) {
+        setTimeout(function() {
+            message.style.transition = 'opacity 0.5s ease-out';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        }, 5000);
+    });
+});
 </script>
 
 <footer class="bg-background dark:bg-background-dark/50 py-4 mt-8">

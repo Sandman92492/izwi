@@ -236,6 +236,9 @@ def login():
             if remember:
                 session.permanent = True
             
+            # Add success message for login
+            flash('Welcome back! You have been successfully logged in.', 'success')
+            
             # Redirect based on whether user has a community
             if user.community_id:
                 return redirect(url_for('dashboard'))
@@ -296,10 +299,14 @@ def signup_submit():
         # Clear invite session
         session.pop('invite_community_id', None)
         
-        # Redirect based on whether they joined via invite
+        # Add success message and redirect based on whether they joined via invite
         if community_id:
-            return redirect(url_for('dashboard'))
+            # Store user info for welcome screen
+            session['new_user_welcome'] = True
+            session['user_name'] = email.split('@')[0].title()  # Use email username as name placeholder
+            return redirect(url_for('welcome'))
         else:
+            flash('Welcome! Your account has been created. Let\'s set up your community.', 'success')
             return redirect(url_for('define_community'))
 
 @app.route('/logout')
@@ -369,10 +376,26 @@ def define_community():
         session.permanent = True
         
         # Boundary data is now stored in the database
+        flash(f'Congratulations! Your community "{community_name}" has been created successfully.', 'success')
         
         return redirect(url_for('dashboard'))
     
     return render_template('define_community.html')
+
+@app.route('/welcome')
+@login_required
+def welcome():
+    # Check if this is a new user welcome
+    if not session.get('new_user_welcome'):
+        return redirect(url_for('dashboard'))
+    
+    user_name = session.get('user_name', 'there')
+    
+    # Clear the welcome session flag
+    session.pop('new_user_welcome', None)
+    session.pop('user_name', None)
+    
+    return render_template('welcome.html', user_name=user_name)
 
 @app.route('/dashboard')
 @login_required
@@ -559,7 +582,7 @@ def update_community_name():
         db.commit()
         
         app.logger.info(f'Community {current_user.community_id} name updated to "{new_name}" by admin {current_user.id}')
-        return jsonify({'success': True, 'message': 'Community name updated successfully'})
+        return jsonify({'success': True, 'message': 'Community name updated successfully!'})
     
     except Exception as e:
         app.logger.error(f'Error updating community name: {e}')
@@ -590,7 +613,7 @@ def update_community_boundary():
         db.commit()
         
         app.logger.info(f'Community {current_user.community_id} boundary updated by admin {current_user.id}')
-        return jsonify({'success': True, 'message': 'Community boundary updated successfully'})
+        return jsonify({'success': True, 'message': 'Community boundary updated successfully!'})
     
     except Exception as e:
         app.logger.error(f'Error updating community boundary: {e}')
