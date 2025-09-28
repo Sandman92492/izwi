@@ -2,7 +2,7 @@ import json
 from flask import session
 from flask_login import current_user
 from app import db
-from models import Community, User
+from models import Community, User, Business
 from utils import sanitize_plain_text, validate_json_data, generate_invite_slug
 
 def create_community(community_name, boundary_data='', business_id=None):
@@ -89,12 +89,14 @@ def remove_member(member_id, admin_user):
     if not (admin_user.role in ['Admin', 'Business'] or admin_user.is_business_user()):
         return False, 'You do not have permission to remove members'
     
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('UPDATE users SET community_id = NULL WHERE id = ?', (member_id,))
-    db.commit()
-    
-    return True, 'Member removed successfully'
+    # Use SQLAlchemy ORM instead of raw database operations
+    user = User.query.get(member_id)
+    if user:
+        user.community_id = None
+        db.session.commit()
+        return True, 'Member removed successfully'
+    else:
+        return False, 'Member not found'
 
 def update_community_name(new_name, community_id, admin_user):
     """Update community name (admin or business user only)"""
@@ -111,17 +113,22 @@ def update_community_name(new_name, community_id, admin_user):
         return False, 'Community name must be less than 100 characters'
     
     # Check if name already exists (excluding current community)
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT id FROM communities WHERE name = ? AND id != ?', (new_name, community_id))
-    if cursor.fetchone():
+    existing_community = Community.query.filter(
+        Community.name == new_name,
+        Community.id != community_id
+    ).first()
+    
+    if existing_community:
         return False, 'A community with this name already exists'
     
     # Update community name
-    cursor.execute('UPDATE communities SET name = ? WHERE id = ?', (new_name, community_id))
-    db.commit()
-    
-    return True, 'Community name updated successfully!'
+    community = Community.query.get(community_id)
+    if community:
+        community.name = new_name
+        db.session.commit()
+        return True, 'Community name updated successfully!'
+    else:
+        return False, 'Community not found'
 
 def update_community_boundary(boundary_data, community_id, admin_user):
     """Update community boundary (admin or business user only)"""
@@ -136,48 +143,42 @@ def update_community_boundary(boundary_data, community_id, admin_user):
             return False, 'Invalid boundary data format'
     
     # Update community boundary
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('UPDATE communities SET boundary_data = ? WHERE id = ?', (boundary_data, community_id))
-    db.commit()
-    
-    return True, 'Community boundary updated successfully!'
+    community = Community.query.get(community_id)
+    if community:
+        community.boundary_data = boundary_data
+        db.session.commit()
+        return True, 'Community boundary updated successfully!'
+    else:
+        return False, 'Community not found'
 
 def get_business_info(business_id):
     """Get business information for white-labeling"""
     if not business_id:
         return None
     
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM businesses WHERE id = ? AND is_active = 1', (business_id,))
-    business = cursor.fetchone()
+    from models import Business
+    business = Business.query.filter_by(id=business_id, is_active=True).first()
     return business
 
 def get_community_business_info(community_id):
     """Get business information associated with a community"""
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('''
-        SELECT b.* FROM businesses b
-        JOIN communities c ON b.id = c.business_id
-        WHERE c.id = ? AND b.is_active = 1
-    ''', (community_id,))
-    business = cursor.fetchone()
+    from models import Business
+    business = db.session.query(Business).join(
+        Community, Business.id == Community.business_id
+    ).filter(
+        Community.id == community_id,
+        Business.is_active == True
+    ).first()
     return business
 
 def get_business_communities(business_id):
     """Get all communities associated with a business"""
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute('SELECT * FROM communities WHERE business_id = ?', (business_id,))
-    communities = cursor.fetchall()
+    communities = Community.query.filter_by(business_id=business_id).all()
     return communities
 
 def create_business(name, logo_url=None, primary_color='#1F2937', contact_email=None, subscription_tier='Free'):
     """Create a new business for white-labeling"""
-    db = get_db()
-    cursor = db.cursor()
+    from models import Business
     
     # Sanitize inputs
     name = sanitize_plain_text(name.strip())
@@ -188,12 +189,15 @@ def create_business(name, logo_url=None, primary_color='#1F2937', contact_email=
     if primary_color:
         primary_color = sanitize_plain_text(primary_color.strip())
     
-    cursor.execute('''
-        INSERT INTO businesses (name, logo_url, primary_color, contact_email, subscription_tier)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (name, logo_url, primary_color, contact_email, subscription_tier))
+    business = Business(
+        name=name,
+        logo_url=logo_url,
+        primary_color=primary_color,
+        contact_email=contact_email,
+        subscription_tier=subscription_tier
+    )
     
-    business_id = cursor.lastrowid
-    db.commit()
+    db.session.add(business)
+    db.session.commit()
     
-    return business_id
+    return business.id
