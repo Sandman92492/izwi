@@ -178,7 +178,7 @@ def welcome():
 def dashboard():
     # Refresh user data from database to ensure we have the latest community_id
     from models import User
-    user_data = User.query.get(current_user.id)
+    user_data = db.session.get(User, current_user.id)
     
     if user_data and user_data.community_id:
         # Update current user object with fresh data from database

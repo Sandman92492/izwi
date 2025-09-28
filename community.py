@@ -43,10 +43,14 @@ def create_community(community_name, boundary_data='', business_id=None):
     db.session.flush()  # Get the ID
     
     # Update user with community_id and admin role
-    user = User.query.get(current_user.id)
+    user = db.session.get(User, current_user.id)
     if user:
         user.community_id = community.id
         user.role = 'Admin'
+        
+        # Also update the current_user object immediately
+        current_user.community_id = community.id
+        current_user.role = 'Admin'
     
     db.session.commit()
     
