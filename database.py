@@ -14,6 +14,20 @@ def init_db():
     db = get_db()
     cursor = db.cursor()
     
+    # Create businesses table for white-labeling
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS businesses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            logo_url TEXT,
+            primary_color TEXT DEFAULT '#1F2937',
+            contact_email TEXT,
+            subscription_tier TEXT DEFAULT 'Free',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            is_active INTEGER DEFAULT 1
+        )
+    ''')
+    
     # Create users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -24,7 +38,10 @@ def init_db():
             avatar_url TEXT,
             community_id INTEGER,
             role TEXT DEFAULT 'Member',
-            FOREIGN KEY (community_id) REFERENCES communities (id)
+            business_id INTEGER,
+            subscription_tier TEXT DEFAULT 'Free',
+            FOREIGN KEY (community_id) REFERENCES communities (id),
+            FOREIGN KEY (business_id) REFERENCES businesses (id)
         )
     ''')
     
@@ -37,16 +54,13 @@ def init_db():
             invite_link_slug TEXT UNIQUE NOT NULL,
             subscription_plan TEXT DEFAULT 'Free',
             boundary_data TEXT,
-            FOREIGN KEY (admin_user_id) REFERENCES users (id)
+            business_id INTEGER,
+            max_alerts INTEGER DEFAULT 100,
+            max_members INTEGER DEFAULT 50,
+            FOREIGN KEY (admin_user_id) REFERENCES users (id),
+            FOREIGN KEY (business_id) REFERENCES businesses (id)
         )
     ''')
-    
-    # Add boundary_data column if it doesn't exist (for existing databases)
-    try:
-        cursor.execute('ALTER TABLE communities ADD COLUMN boundary_data TEXT')
-    except sqlite3.OperationalError:
-        # Column already exists
-        pass
     
     # Create alerts table
     cursor.execute('''
@@ -60,10 +74,29 @@ def init_db():
             longitude REAL DEFAULT 0,
             timestamp DATETIME NOT NULL,
             is_resolved INTEGER DEFAULT 0,
+            is_premium_feature INTEGER DEFAULT 0,
             FOREIGN KEY (community_id) REFERENCES communities (id),
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
+    
+    # Migration: Add new columns to existing tables if they don't exist
+    migrations = [
+        ('communities', 'boundary_data', 'TEXT'),
+        ('communities', 'business_id', 'INTEGER'),
+        ('communities', 'max_alerts', 'INTEGER DEFAULT 100'),
+        ('communities', 'max_members', 'INTEGER DEFAULT 50'),
+        ('users', 'business_id', 'INTEGER'),
+        ('users', 'subscription_tier', 'TEXT DEFAULT "Free"'),
+        ('alerts', 'is_premium_feature', 'INTEGER DEFAULT 0')
+    ]
+    
+    for table, column, column_type in migrations:
+        try:
+            cursor.execute(f'ALTER TABLE {table} ADD COLUMN {column} {column_type}')
+        except sqlite3.OperationalError:
+            # Column already exists
+            pass
     
     db.commit()
     db.close()
