@@ -22,19 +22,37 @@ A Flask-based community alert system that allows users to create and join commun
 - **2025-09-28**: Created Privacy Policy emphasizing South African data storage and user rights
 - **2025-09-28**: Created Terms of Service with emergency service disclaimers and user responsibilities
 - **2025-09-28**: Added footer links to legal documents across all main application templates
+- **2025-09-28**: **Major Backend Refactoring**: Restructured monolithic main.py into organized modules for better maintainability and extensibility
 
 ## Project Architecture
-### Backend Structure
-- `main.py`: Flask application with all routes and authentication logic
-- `database.py`: SQLite database initialization and schema management
-- `templates/`: Jinja2 templates converted from original HTML designs
-  - `home.html`: Main landing page with sign-in and sign-up options
-  - `login.html`: User login page with link back to sign-up
-  - `landing.html`: Community sign-up page with community invitation support
-  - `dashboard.html`: Main dashboard with alert feed and map view
-  - `settings.html`: Community management and member administration
-  - `define_community.html`: Community creation interface
-  - `post_alert.html`: Alert posting modal/interface
+### Backend Structure (Modular Architecture)
+- **Core Application**:
+  - `main.py`: Flask app initialization and route definitions only
+  - `config.py`: Flask application configuration and extension setup
+  - `database.py`: SQLite database initialization and schema management
+
+- **Feature Modules**:
+  - `auth.py`: User authentication logic (User class, login/logout, signup, session management)
+  - `community.py`: Community management (creation, invites, member management, boundaries)
+  - `alerts.py`: Alert functionality (posting, displaying, reporting, categorization)
+  - `utils.py`: Helper functions (sanitization, validation, formatting, category handling)
+
+- **Templates**:
+  - `templates/`: Jinja2 templates converted from original HTML designs
+    - `home.html`: Main landing page with sign-in and sign-up options
+    - `login.html`: User login page with link back to sign-up
+    - `landing.html`: Community sign-up page with community invitation support
+    - `dashboard.html`: Main dashboard with alert feed and map view
+    - `settings.html`: Community management and member administration
+    - `define_community.html`: Community creation interface
+    - `post_alert.html`: Alert posting modal/interface
+
+**Architecture Benefits**:
+- **Separation of Concerns**: Each module handles a specific domain (auth, communities, alerts)
+- **Maintainability**: Easier to locate and modify specific functionality
+- **Extensibility**: New features can be added to appropriate modules without affecting others
+- **Testing**: Individual modules can be tested in isolation
+- **Clean Dependencies**: One-way import flow (routes → modules → database/utils)
 
 ### Database Schema
 - **users**: id, email, password_hash, name, avatar_url, community_id, role
