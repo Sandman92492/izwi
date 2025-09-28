@@ -108,6 +108,31 @@
     </div>
   {% endif %}
 {% endwith %}
+
+<!-- Community Header -->
+<div class="bg-gradient-to-r from-primary to-primary/80 text-white px-4 py-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="font-display font-bold text-2xl mb-1">{{ community.name }}</h1>
+      <div class="flex items-center gap-4 text-white/90">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">group</span>
+          <span class="font-medium">{{ member_count }} {% if member_count == 1 %}member{% else %}members{% endif %}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">verified</span>
+          <span class="font-medium">Active Community</span>
+        </div>
+      </div>
+    </div>
+    <a href="{{ url_for('post_alert') }}" 
+       class="bg-white text-primary px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2">
+      <span class="material-symbols-outlined">add_alert</span>
+      Post Alert
+    </a>
+  </div>
+</div>
+
 <div class="h-1/2 relative">
 <div id="map" class="w-full h-full"></div>
 </div>

@@ -201,9 +201,16 @@ def dashboard():
     # Get community boundary data
     boundary_data = get_community_boundary_data(current_user.community_id)
     
+    # Get community info and member count
+    community = get_community_info(current_user.community_id)
+    members = get_community_members(current_user.community_id)
+    member_count = len(members) if members else 0
+    
     return render_template('dashboard.html', 
                          alerts=alerts, 
                          boundary_data=boundary_data,
+                         community=community,
+                         member_count=member_count,
                          get_category_color=get_category_color, 
                          get_category_icon=get_category_icon,
                          format_time_ago=format_time_ago)
