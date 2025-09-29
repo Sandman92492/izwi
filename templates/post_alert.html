@@ -109,10 +109,17 @@
 
 <div>
 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Location</h2>
+<div class="mb-3 flex gap-2">
+<button type="button" onclick="requestCurrentLocation()" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+<span class="text-sm">📍</span>
+<span class="text-sm font-medium">Use My Location</span>
+</button>
+<div id="location-status" class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"></div>
+</div>
 <div class="relative h-64 w-full rounded-xl overflow-hidden">
 <div id="location-map" class="w-full h-full"></div>
 <div class="absolute top-3 left-3 bg-white/90 dark:bg-black/70 p-2 rounded-lg shadow-lg text-xs">
-<span class="text-gray-800 dark:text-gray-200">Click on the map to set location</span>
+<span class="text-gray-800 dark:text-gray-200">Click "Use My Location" or click on the map to set location</span>
 </div>
 </div>
 <input type="hidden" name="latitude" id="latitude">
@@ -155,19 +162,99 @@ locationMap.on('click', function(e) {
     document.getElementById('longitude').value = lng;
 });
 
-// Get user's current location
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
-        
-        locationMap.setView([lat, lng], 15);
-        
-        // Add marker at current location
-        selectedMarker = L.marker([lat, lng]).addTo(locationMap);
-        document.getElementById('latitude').value = lat;
-        document.getElementById('longitude').value = lng;
-    });
+// Location detection functions
+function requestCurrentLocation() {
+    if (!navigator.geolocation) {
+        showLocationStatus('Location services not supported by your browser', 'error');
+        return;
+    }
+
+    showLocationStatus('Getting your location...', 'loading');
+
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            
+            // Update map view
+            locationMap.setView([lat, lng], 15);
+            
+            // Remove existing marker
+            if (selectedMarker) {
+                locationMap.removeLayer(selectedMarker);
+            }
+            
+            // Add marker at current location
+            selectedMarker = L.marker([lat, lng]).addTo(locationMap);
+            selectedMarker.bindPopup('<div class="text-center p-2"><strong>Your Current Location</strong></div>');
+            
+            // Update form fields
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            
+            showLocationStatus('Location set successfully', 'success');
+            
+            console.log('User location set:', lat, lng);
+        },
+        function(error) {
+            var message = '';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message = 'Location access denied. Please manually click on the map to set location.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = 'Location unavailable. Please manually click on the map to set location.';
+                    break;
+                case error.TIMEOUT:
+                    message = 'Location request timed out. Please try again or manually click on the map.';
+                    break;
+                default:
+                    message = 'Error getting location. Please manually click on the map to set location.';
+                    break;
+            }
+            showLocationStatus(message, 'error');
+            console.log('Geolocation error:', error);
+        },
+        {
+            timeout: 10000, // 10 second timeout
+            enableHighAccuracy: true,
+            maximumAge: 300000 // 5 minutes cache
+        }
+    );
+}
+
+function showLocationStatus(message, type) {
+    const statusDiv = document.getElementById('location-status');
+    
+    let icon = '';
+    let className = '';
+    
+    switch(type) {
+        case 'loading':
+            icon = '<div class="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>';
+            className = 'text-blue-600';
+            break;
+        case 'success':
+            icon = '✅';
+            className = 'text-green-600';
+            break;
+        case 'error':
+            icon = '⚠️';
+            className = 'text-yellow-600';
+            break;
+        default:
+            icon = 'ℹ️';
+            className = 'text-gray-600';
+    }
+    
+    statusDiv.innerHTML = `<span>${icon}</span><span class="${className}">${message}</span>`;
+    
+    // Auto-hide success/error messages after 5 seconds
+    if (type === 'success' || type === 'error') {
+        setTimeout(() => {
+            statusDiv.innerHTML = '';
+        }, 5000);
+    }
 }
 
 // Category selection
@@ -213,6 +300,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!selectedCategory) {
             e.preventDefault();
             alert('Please select a category for your alert.');
+            return;
+        }
+        
+        // Check if location is set
+        const latitude = document.getElementById('latitude').value;
+        const longitude = document.getElementById('longitude').value;
+        
+        if (!latitude || !longitude || (latitude === '0' && longitude === '0')) {
+            e.preventDefault();
+            alert('Please set your location by clicking "Use My Location" or clicking on the map.');
+            showLocationStatus('Location required - please click "Use My Location" or click on the map', 'error');
             return;
         }
         
