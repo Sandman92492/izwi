@@ -69,10 +69,17 @@ def get_category_icon(category):
     }
     return icons.get(category, '❗')
 
-def format_time_ago(timestamp_str):
+def format_time_ago(timestamp_input):
     """Format timestamp to relative time"""
     try:
-        timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+        # Handle both datetime objects and timestamp strings
+        if isinstance(timestamp_input, datetime):
+            timestamp = timestamp_input
+        else:
+            # If it's a string, parse it
+            timestamp_str = str(timestamp_input)
+            timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+        
         now = datetime.now(timestamp.tzinfo) if timestamp.tzinfo else datetime.now()
         diff = now - timestamp
         
@@ -89,8 +96,9 @@ def format_time_ago(timestamp_str):
             return f"{minutes} {'minute' if minutes == 1 else 'minutes'} ago"
         else:
             return "Just now"
-    except:
-        return timestamp_str
+    except Exception as e:
+        # Fallback: return the original input as string
+        return str(timestamp_input)
 
 # Subscription and Premium Feature Utilities
 
