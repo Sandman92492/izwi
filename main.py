@@ -51,7 +51,6 @@ def signup_page():
     return render_template('landing.html', invite=invite)
 
 @app.route('/login', methods=['GET', 'POST'])
-@csrf.exempt  # Temporarily exempt from CSRF for debugging
 def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
