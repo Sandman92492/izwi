@@ -91,9 +91,21 @@ def init_db():
         ('alerts', 'is_premium_feature', 'INTEGER DEFAULT 0')
     ]
     
+    # Valid identifiers for security - only allow known safe values
+    valid_tables = {'communities', 'users', 'alerts', 'businesses'}
+    valid_columns = {'boundary_data', 'business_id', 'max_alerts', 'max_members', 'subscription_tier', 'is_premium_feature'}
+    
     for table, column, column_type in migrations:
+        # Validate identifiers against known safe values
+        if table not in valid_tables:
+            continue
+        if column not in valid_columns:
+            continue
+            
         try:
-            cursor.execute(f'ALTER TABLE {table} ADD COLUMN {column} {column_type}')
+            # Use quoted identifiers for safety (prevents injection even with dynamic values)
+            sql = f'ALTER TABLE "{table}" ADD COLUMN "{column}" {column_type}'
+            cursor.execute(sql)
         except sqlite3.OperationalError:
             # Column already exists
             pass
