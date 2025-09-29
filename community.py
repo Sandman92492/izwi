@@ -162,7 +162,6 @@ def get_business_info(business_id):
 
 def get_community_business_info(community_id):
     """Get business information associated with a community"""
-    from models import Business
     business = db.session.query(Business).join(
         Community, Business.id == Community.business_id
     ).filter(
@@ -178,8 +177,6 @@ def get_business_communities(business_id):
 
 def create_business(name, logo_url=None, primary_color='#1F2937', contact_email=None, subscription_tier='Free'):
     """Create a new business for white-labeling"""
-    from models import Business
-    
     # Sanitize inputs
     name = sanitize_plain_text(name.strip())
     if logo_url:

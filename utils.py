@@ -139,38 +139,39 @@ def get_subscription_limits(subscription_tier):
 
 def check_community_limits(community, action_type):
     """Check if community has reached limits for certain actions"""
-    from database import get_db
+    from app import db
+    from models import User, Alert
+    from datetime import datetime
+    from sqlalchemy import func, extract
     
     if not community:
         return False, "Community not found"
     
-    # Get subscription limits - properly handle sqlite3.Row object
+    # Get subscription limits - handle Community model object
     try:
-        subscription_plan = community['subscription_plan'] if 'subscription_plan' in community.keys() else 'Free'
+        subscription_plan = getattr(community, 'subscription_plan', 'Free')
     except (TypeError, AttributeError):
-        # Fallback for older community data structures
-        subscription_plan = community[4] if len(community) > 4 else 'Free'
+        subscription_plan = 'Free'
     
     limits = get_subscription_limits(subscription_plan)
     
-    db = get_db()
-    cursor = db.cursor()
-    
     if action_type == 'add_member':
-        # Check member count
-        cursor.execute('SELECT COUNT(*) FROM users WHERE community_id = ?', (community[0],))
-        member_count = cursor.fetchone()[0]
+        # Check member count using SQLAlchemy
+        member_count = db.session.query(User).filter_by(community_id=community.id).count()
         
         if member_count >= limits['max_community_members']:
             return False, f"You've reached the maximum number of members ({limits['max_community_members']}) for your plan. Please upgrade to add more members."
     
     elif action_type == 'post_alert':
-        # Check alerts this month
-        cursor.execute('''
-            SELECT COUNT(*) FROM alerts 
-            WHERE community_id = ? AND timestamp >= date('now', 'start of month')
-        ''', (community[0],))
-        alert_count = cursor.fetchone()[0]
+        # Check alerts this month using SQLAlchemy
+        current_year = datetime.now().year
+        current_month = datetime.now().month
+        
+        alert_count = db.session.query(Alert).filter(
+            Alert.community_id == community.id,
+            extract('year', Alert.timestamp) == current_year,
+            extract('month', Alert.timestamp) == current_month
+        ).count()
         
         if alert_count >= limits['max_alerts_per_month']:
             return False, f"You've reached the maximum number of alerts ({limits['max_alerts_per_month']}) for this month. Please upgrade your plan."
@@ -187,9 +188,9 @@ def get_community_branding(community_id):
     
     if business_info:
         return {
-            'business_name': business_info[1],  # name
-            'logo_url': business_info[2],       # logo_url
-            'primary_color': business_info[3],  # primary_color
+            'business_name': business_info.name,
+            'logo_url': business_info.logo_url,
+            'primary_color': business_info.primary_color,
             'is_white_labeled': True
         }
     
