@@ -209,7 +209,7 @@ Report
 </script>
 
 <script type="application/json" id="boundary-data">
-{% if boundary_data %}"{{ boundary_data|e }}"{% else %}null{% endif %}
+{% if boundary_data %}{{ boundary_data|safe }}{% else %}null{% endif %}
 </script>
 
 <!-- Load dashboard JavaScript -->
