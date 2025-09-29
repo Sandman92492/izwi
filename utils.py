@@ -76,14 +76,17 @@ def format_time_ago(timestamp_str):
         now = datetime.now(timestamp.tzinfo) if timestamp.tzinfo else datetime.now()
         diff = now - timestamp
         
-        if diff.days > 0:
-            return f"{diff.days}d ago"
+        if diff.days > 7:
+            # For older dates, show month and day
+            return timestamp.strftime("%b %d")
+        elif diff.days > 0:
+            return f"{diff.days} {'day' if diff.days == 1 else 'days'} ago"
         elif diff.seconds > 3600:
             hours = diff.seconds // 3600
-            return f"{hours}h ago"
+            return f"{hours} {'hour' if hours == 1 else 'hours'} ago"
         elif diff.seconds > 60:
             minutes = diff.seconds // 60
-            return f"{minutes}m ago"
+            return f"{minutes} {'minute' if minutes == 1 else 'minutes'} ago"
         else:
             return "Just now"
     except:
