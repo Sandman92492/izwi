@@ -193,8 +193,6 @@ function requestCurrentLocation() {
             document.getElementById('longitude').value = lng;
             
             showLocationStatus('Location set successfully', 'success');
-            
-            console.log('User location set:', lat, lng);
         },
         function(error) {
             var message = '';
